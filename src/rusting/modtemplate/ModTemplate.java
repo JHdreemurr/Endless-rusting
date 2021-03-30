@@ -1,8 +1,8 @@
-package sonnicon.modtemplate;
+package rusting;
 
 import mindustry.mod.Mod;
 
-public class ModTemplate extends Mod{
+public class Rusting extends Mod{
 
     @Override
     public void init(){
@@ -10,5 +10,9 @@ public class ModTemplate extends Mod{
 
     @Override
     public void loadContent(){
+        @Overide
+        public void loadContent(){
+            
+        }
     }
 }

@@ -1,4 +1,4 @@
-package rusting;
+package endlessRusting.rusting;
 
 import mindustry.mod.Mod;
 

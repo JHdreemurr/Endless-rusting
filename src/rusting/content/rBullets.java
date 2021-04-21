@@ -1,4 +1,4 @@
-package rBullets;
+package rusting.rBullets;
 
 import arc.graphics.*;
 import arc.graphics.g2d.*;

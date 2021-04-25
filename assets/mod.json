@@ -1,12 +1,10 @@
 {
-  "name": "modtemplate",
-  "displayName": "Template",
-  "author": "[#8738ff[]]Sonnicon[[]]",
-  "description": "Gradle jar Mindustry mod template",
-  "version": "0",
-  "main": "sonnicon.modtemplate.ModTemplate",
-  "minGameVersion": "105",
-  "dependencies": [],
-  "hidden": false,
+  "name": "endless-rusting",
+  "displayName": "endles rustign",
+  "author": "sh1p",
+  "description": "yes",
+  "version": "2324435",
+  "main": "rusting.EndlessRusting",
+  "minGameVersion": "126.2",
   "java": true
 }

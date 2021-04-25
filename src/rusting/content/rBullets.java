@@ -25,8 +25,6 @@ public class rustingBullets implements contentList{
 	   basicBulletT = new BasicBulletType(1, 5, "shell"){
             width = 8f;
             height = 6f;
-            
         }
-
 	}
 }

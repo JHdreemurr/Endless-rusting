@@ -1,4 +1,4 @@
-package rusting.rBullets;
+package rusting.content;
 
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -14,17 +14,17 @@ import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
-public class rustingBullets implements contentList{
-	public static BulletType	
-	//basic bullet
-	basicBulletT
-
-	@Override
-	public void load(){
-	
-	   basicBulletT = new BasicBulletType(1, 5, "shell"){
+public class RustingBullets implements ContentList{
+    public static BulletType
+    //basic bullet
+    basicBulletT;
+    
+    @Override
+    public void load(){
+    
+        basicBulletT = new BasicBulletType(1, 5, "shell"){
             width = 8f;
             height = 6f;
         }
-	}
+    }
 }

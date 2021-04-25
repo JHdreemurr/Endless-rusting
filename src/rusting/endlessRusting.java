@@ -1,5 +1,6 @@
 package rusting;
 
+import arc.struct.Seq;
 import mindustry.mod.Mod;
 
 import rusting.content.*;

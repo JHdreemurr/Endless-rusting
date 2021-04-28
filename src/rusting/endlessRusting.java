@@ -7,8 +7,9 @@ import rusting.content.*;
 
 public class EndlessRusting extends Mod{
     
-    private Seq<ContentList> contentLists = Seq.with(
-        new RustingBullets()
+    private static Seq<ContentList> contentLists = Seq.with(
+        new RustingBullets(),
+        new RustingBlocks()
     );
     
     @Override

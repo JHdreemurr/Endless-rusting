@@ -22,9 +22,8 @@ public class RustingBullets implements ContentList{
     @Override
     public void load(){
     
-        basicBulletT = new BasicBulletType(1, 5, "shell"){
-            width = 8f;
-            height = 6f;
-        }
+        basicBulletT = new BasicBulletType(1, 5, "shell"){{
+
+        }};
     }
 }

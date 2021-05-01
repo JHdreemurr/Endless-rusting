@@ -15,5 +15,9 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public class RustingUnits implements ContentList{
-    
+
+    @Override
+    public void load() {
+
+    }
 }

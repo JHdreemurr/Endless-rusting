@@ -1,13 +1,14 @@
 package rusting;
 
 import arc.struct.Seq;
+import mindustry.ctype.ContentList;
 import mindustry.mod.Mod;
 
 import rusting.content.*;
 
 public class EndlessRusting extends Mod{
-    
-    private static Seq<ContentList> contentLists = Seq.with(
+
+    private static final Seq<ContentList> contentLists = Seq.with(
         new RustingBullets(),
         new RustingBlocks()
     );

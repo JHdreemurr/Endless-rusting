@@ -9,15 +9,17 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.meta.*;
+import mindustry.world.blocks.environment.*;
 
 import static mindustry.type.ItemStack.*;
 
 import static mindustry.Vars.*;
 
 public class RustingBlocks implements ContentList{
-    public static Block;
+    public static Block
         //environment
-        paileanStolnen, paileanPathen
+        paileanStolnen, paileanPathen;
         
     public void load(){
         //region environment

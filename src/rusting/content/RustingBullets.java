@@ -4,6 +4,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.content.Fx;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
@@ -16,14 +17,14 @@ import static mindustry.Vars.*;
 
 public class RustingBullets implements ContentList{
     public static BulletType
-    //basic bullet
-    basicBulletT;
+    //weather bullets
+            fossilShard;
     
     @Override
     public void load(){
     
-        basicBulletT = new BasicBulletType(1, 5, "shell"){{
-
+        fossilShard = new BasicBulletType(1, 5, "shell"){{
+            hitEffect = Fx.hitFuse;
         }};
     }
 }

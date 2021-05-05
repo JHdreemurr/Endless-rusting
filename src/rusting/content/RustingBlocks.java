@@ -26,7 +26,7 @@ public class RustingBlocks implements ContentList{
         
         paileanStolnen = new Floor("pailean-stolnen"){{
             speedMultiplier = 0.95f;
-            variants = 1;
+            variants = 3;
             attributes.set(Attribute.water, -0.85f);
         }};
 

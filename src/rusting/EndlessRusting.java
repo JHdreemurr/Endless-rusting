@@ -9,6 +9,7 @@ import rusting.content.*;
 public class EndlessRusting extends Mod{
     public static String modname = "endless-rusting";
     private static final Seq<ContentList> contentLists = Seq.with(
+        new RustingStatusEffects(),
         new RustingBullets(),
         new RustingBlocks(),
         new RustingWeathers()

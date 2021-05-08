@@ -19,7 +19,8 @@ public class RustingWeathers implements ContentList{
     public void load(){
         fossilStorm = new BulletParticleWeather("fossil-storm"){{
             particleBullet = RustingBullets.fossilShard;
-            dynamicSpawning = false;
+            dynamicSpawning = true;
+            chanceSpawn = 1;
             randRange = new Vec2(4, 4);
             color = noiseColor = Color.valueOf("#c4cf6f");
             particleRegion = "particle";

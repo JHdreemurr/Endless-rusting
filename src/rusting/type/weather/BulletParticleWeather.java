@@ -3,6 +3,7 @@ package rusting.type.weather;
 import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.Pixmap;
+import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
 import arc.util.Time;
@@ -32,8 +33,12 @@ public class BulletParticleWeather extends ParticleWeather {
     //Colour of generated region. Only change if PixmapRegion is not found
     public Color regionColour = Color.white;
 
+    TextureRegion drawParticleRegion = null;
+
     public BulletParticleWeather(String name) {
         super(name);
+        //DO NOT ENABLE, until I get a separate region for particles working, don't enable this.
+        drawParticles = false;
     }
 
     @Override
@@ -43,6 +48,7 @@ public class BulletParticleWeather extends ParticleWeather {
 
     @Override public void load(){
         region = Core.atlas.find(name);
+        drawParticleRegion = Core.atlas.find(particleRegion);
         if(region != null && region != Core.atlas.find("error")) return;
         region = Drawr.addTexture(Drawr.pigmentae(Core.atlas.getPixmap(EndlessRusting.modname + "-" + "bullet-particle-weather-template"), regionColour), name);
     }
@@ -51,7 +57,7 @@ public class BulletParticleWeather extends ParticleWeather {
     public void createIcons(MultiPacker packer){
         super.createIcons(packer);
         if(region != null) return;
-        Pixmap genRegion = Drawr.pigmentae(Core.atlas.getPixmap("bulletParticleWeatherTemplate"), color);
+        Pixmap genRegion = Drawr.pigmentae(Core.atlas.getPixmap(EndlessRusting.modname + "-" + "bullet-particle-weather-template"), color);
         packer.add(MultiPacker.PageType.main, name, genRegion);
     }
 
@@ -77,7 +83,7 @@ public class BulletParticleWeather extends ParticleWeather {
             rny = rny * 8;
             if(Vars.world.tile(rnx/8, rny/8).block() == Blocks.air) {
                 if (Mathf.chance(dynamicSpawning ? chance * chanceSpawn: chanceSpawn)) {
-                    particleBullet.create(null, Team.derelict, (float) rnx + Mathf.random(randRange.x), (float) rny + Mathf.random(randRange.y), state.windVector.angle(), particleBullet.damage, (float) (chance * chance * 2), (float) 1, state);
+                    particleBullet.create(null, Team.derelict, (float) rnx + Mathf.random(randRange.x), (float) rny + Mathf.random(randRange.y), state.windVector.angle(), particleBullet.damage, (float) (chance * chance * 4), (float) 1, state);
                     particleBullet.hitEffect.at(rnx, rny);
                 }
             }

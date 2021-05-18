@@ -1,7 +1,11 @@
 package rusting.type;
 
+import arc.util.Log;
 import mindustry.ctype.*;
 import rusting.ctype.*;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
 public class Capsule<itemStack, liquidStack> extends UnlockableContent {
     public itemStack itemStore;
@@ -13,10 +17,10 @@ public class Capsule<itemStack, liquidStack> extends UnlockableContent {
     //Resistance to heat. Used in game, only a stat outside of in game usage.
     public int heatResistance = 0;
 
-    public Capsule(String name) {
-        super(name);
-        this.itemStore = null;
-        this.liquidStore = null;
+    public enum changeme
+    {
+        value1,
+        value2;
     }
 
     public Capsule(String name, itemStack itemPayload, liquidStack liquidPayload) {
@@ -35,8 +39,48 @@ public class Capsule<itemStack, liquidStack> extends UnlockableContent {
         return null;
     }
 
-    //@Override
-    /*public ContentType getContentType(){
-        return ERContentType.capsule;
-    }*/
+
+    protected static Field getEnumsArrayField(Class<?> ec) throws Exception {
+        Field field = ec.getDeclaredField("ENUM$VALUES");
+        field.setAccessible(true);
+        return field;
+    }
+
+    protected static void clearFieldAccessors(Field field) throws ReflectiveOperationException {
+        Field fa = Field.class.getDeclaredField("fieldAccessor");
+        fa.setAccessible(true);
+        fa.set(field, null);
+
+        Field ofa = Field.class.getDeclaredField("overrideFieldAccessor");
+        ofa.setAccessible(true);
+        ofa.set(field, null);
+
+        Field rf = Field.class.getDeclaredField("root");
+        rf.setAccessible(true);
+        Field root = (Field) rf.get(field);
+        if (root != null) {
+            clearFieldAccessors(root);
+        }
+    }
+
+    protected static <E extends Enum<E>> void setEnumsArray(Class<E> ec, E... e) throws Exception {
+        Field field = ec.getDeclaredField("ENUM$VALUES");
+        Field modifiersField = Field.class.getDeclaredField("modifiers");
+        field.setAccessible(true);
+        modifiersField.setAccessible(true);
+        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+        field.set(ec, e);
+    }
+
+    public static void getContent() throws Exception {
+
+        getEnumsArrayField(changeme.class).get(null);
+        clearFieldAccessors(getEnumsArrayField(changeme.class));
+        setEnumsArray(changeme.class, changeme.value2);
+
+        Field[] declaredFields = changeme.class.getDeclaredFields();
+        for (Field field : declaredFields) {
+            Log.err(field.getName() + ": " + field.getType());
+        }
+    }
 }

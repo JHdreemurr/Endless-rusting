@@ -1,9 +1,9 @@
 {
   "name": "endless-rusting",
   "displayName": "Endless Rusting",
-  "author": "sh1p",
-  "description": "test java mod",
-  "version": "t_e v_i_ co_u__s a__ v1",
+  "author": "Sh1penfire",
+  "description": "The place, a desolate wasteland it will become. The crash transformed everything. Wasteland may not be the best word for it, as there is still life, yet so far away from what we normaly expect. \n \n \nWelcome to the Endless Rusting, and thanks to \n[SK]Roomba#8215 for tesla sprite and helping me playtest, \nQmelZ the Void#0526 for helping me with code, \ncl0cks#0039 for helping me come up with ideas \n \nFor making this posible. It may be a small mod, but it'll improve and grow as the months pass. I hope that you have a good time playing, and I'll cya in the past. \nCrae, and Mhem.",
+  "version": "_i_ co_u__s a__ 3",
   "main": "rusting.EndlessRusting",
   "minGameVersion": "126.2",
   "hidden": false,

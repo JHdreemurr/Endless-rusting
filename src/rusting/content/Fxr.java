@@ -37,8 +37,8 @@ public class Fxr{
                 });
             }),
 
-            singingFlame = new Effect(15, e ->{
-                color(Pal.lightFlame, Pal.darkFlame, e.fin());
+            singingFlame = new Effect(18, e ->{
+                color(Pal.lightPyraFlame, Pal.darkPyraFlame, e.fin() * e.fin());
                 float vx = e.x, vy = e.y;
                 if(e.data instanceof Position){
                     //fidn the offset from the bullet to it's data
@@ -47,8 +47,15 @@ public class Fxr{
                 }
                 float finalVx = vx;
                 float finalVy = vy;
-                randLenVectors(e.id, 2, 2f + e.fin() * 16f, e.rotation + 180, 15, (x, y) -> {
+                randLenVectors(e.id, 3, 2f + e.fin() * 16f, e.rotation + 180, 15, (x, y) -> {
                     Fill.circle(finalVx + x, finalVy + y, 0.2f + e.fout() * 1.5f);
+                });
+            }),
+
+            paveFlame = new Effect(45, e ->{
+                randLenVectors(e.id, 5, 7f + e.fin() * 16f, e.rotation + 180, 15, (x, y) -> {
+                    color(Pal.lighterOrange, Pal.lightFlame, Math.abs(x * y/4));
+                    Fill.circle(e.x + x, e.y + y, e.fout() * e.fout() * 2.3f);
                 });
             }),
 

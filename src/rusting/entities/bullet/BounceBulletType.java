@@ -24,13 +24,14 @@ public class BounceBulletType extends ConsBulletType {
     public float trailWidth = 1;
 
     public BounceBulletType(int speed, int damage, String sprite) {
-        super();
+        super(speed, damage, sprite);
         this.sprite = sprite;
         this.speed = speed;
         this.damage = damage;
         this.pierce = true;
         this.pierceBuilding = true;
         this.trailWidth = width/5;
+        this.shrinkX = 0.8f;
     }
 
     public void init(Bullet b) {
@@ -47,7 +48,7 @@ public class BounceBulletType extends ConsBulletType {
 
     @Override
     public void draw(Bullet b){
-        ((Seq<Trail>)b.data).each(t -> t.draw(trailColor, trailWidth));
+        ((Seq<Trail>)b.data).each(t -> t.draw(trailColor, trailWidth * b.fout()));
         super.draw(b);
     }
 

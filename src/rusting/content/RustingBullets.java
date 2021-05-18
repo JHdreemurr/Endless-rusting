@@ -1,21 +1,32 @@
 package rusting.content;
 
 import arc.func.Cons;
+import arc.graphics.Color;
 import arc.math.Mathf;
+import mindustry.Vars;
 import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
 import mindustry.content.UnitTypes;
 import mindustry.ctype.*;
+import mindustry.entities.Fires;
 import mindustry.entities.bullet.*;
 import mindustry.gen.Bullet;
+import mindustry.gen.Fire;
+import mindustry.graphics.Pal;
 import rusting.entities.bullet.BounceBulletType;
+import rusting.entities.bullet.ConsBulletType;
 import rusting.math.Mathr;
 import rusting.world.blocks.defense.turret.PanelTurret;
 
 public class RustingBullets implements ContentList{
     public static BulletType
-    //weather bullets
-            fossilShard, mhenShard, fraeShard;
+    //lore related bullets. The crae, raeh, mhem, frae, pave and the dark were united, until the first port's crash.
+            //basic bullets
+            fossilShard, craeShard, raehShard, mhenShard, fraeShard, paveShard, darkShard,
+            //lightning bullets
+            craeBolt,
+            //
+            paveBolt;
     
     @Override
     public void load(){
@@ -34,6 +45,42 @@ public class RustingBullets implements ContentList{
             bounciness = 0.6;
         }};
 
+        craeShard = new BounceBulletType(4, 5, "bullet"){{
+            width = 7;
+            height = 8;
+            lifetime = 15;
+            hitEffect = Fx.hitFuse;
+            despawnEffect = Fx.plasticburn;
+            bounceEffect = Fx.hitLancer;
+            status = StatusEffects.shocked;
+            frontColor = Color.sky.lerp(Pal.lightTrail, 0.15f);
+            backColor = Pal.lancerLaser.lerp(Pal.lightPyraFlame, 0.3f);
+            trailColor = frontColor;
+            trailEffect = Fx.lightningShoot;
+            knockback = 1;
+            drag = 0.005f;
+            bounciness = 0.6;
+        }};
+
+        raehShard = new BounceBulletType(6, 12, "bullet"){{
+            width = 9;
+            height = 10;
+            lifetime = 45;
+            hitEffect = Fx.hitFuse;
+            despawnEffect = Fx.plasticburn;
+            bounceEffect = Fx.blockExplosionSmoke;
+            trailColor = Pal.darkPyraFlame;
+            incendChance = 1;
+            incendAmount = 3;
+            status = StatusEffects.burning;
+            statusDuration = 640;
+            trailLength = 10;
+            homingPower = 0.25F;
+            knockback = 3;
+            drag = 0.005f;
+            bounciness = 0.85;
+        }};
+
         mhenShard = new BounceBulletType(6, 25, "bullet"){{
             consUpdate = new Cons<Bullet>() {
                 @Override
@@ -50,6 +97,80 @@ public class RustingBullets implements ContentList{
             incendAmount = 10;
             status = StatusEffects.burning;
             statusDuration = 3600;
+            width = 6;
+            height = 8;
+            hitSize = 12;
+            lifetime = 35;
+            hitEffect = Fx.hitFuse;
+            trailLength = 0;
+            homingPower = 0.125F;
+            drag = 0.015f;
+            bounciness = 0.95;
+        }};
+
+        fraeShard = new ConsBulletType(10, 25, "bullet"){{
+            consUpdate = new Cons<Bullet>() {
+                @Override
+                public void get(Bullet bullet) {
+                    darkShard.create(bullet.owner, bullet.team, bullet.x, bullet.y, bullet.rotation() - 90, Mathr.helix(7, 1, bullet.fin()));
+                    darkShard.create(bullet.owner, bullet.team, bullet.x, bullet.y, bullet.rotation() + 90, Mathr.helix(7, 1, bullet.fin()));
+                }
+            };
+            despawnEffect = Fx.plasticburn;
+            hitEffect = Fx.plasticExplosion;
+            status = StatusEffects.corroded;
+            statusDuration = 7200;
+            width = 10;
+            height = 12;
+            pierce = true;
+            pierceBuilding = true;
+            lifetime = 20;
+            hitEffect = Fx.hitFuse;
+        }};
+
+        paveShard = new ConsBulletType(12, 100, "bullet"){{
+            consUpdate = new Cons<Bullet>() {
+                @Override
+                public void get(Bullet bullet){
+
+                    Fxr.singingFlame.at(bullet.x, bullet.y, bullet.rotation() + Mathr.helix(7, 45, bullet.fin()));
+                    Fxr.singingFlame.at(bullet.x, bullet.y, bullet.rotation() - Mathr.helix(7, 45, bullet.fin()));
+
+                    if(bullet.collided.size >= 1) {
+                        Fires.create(Vars.world.tileWorld(bullet.x, bullet.y));
+                        Fxr.paveFlame.at(bullet.x, bullet.y, bullet.rotation());
+                    }
+                }
+            };
+            despawnEffect = Fx.fireSmoke;
+            hitEffect = Fxr.shootMhemFlame;
+            incendChance = 1;
+            incendAmount = 10;
+            status = StatusEffects.melting;
+            statusDuration = 3600;
+            width = 8;
+            height = 10;
+            hitSize = 12;
+            pierce = true;
+            pierceBuilding = true;
+            lifetime = 25;
+            hitEffect = Fx.hitFuse;
+        }};
+
+        darkShard = new BounceBulletType(4, 15, "bullet"){{
+            consUpdate = new Cons<Bullet>() {
+                @Override
+                public void get(Bullet bullet) {
+                    if(bullet.fin() % 0.04 < 0.01) Fxr.blackened.at(bullet.x, bullet.y, bullet.rotation());
+                }
+            };
+            despawnEffect = Fx.fireSmoke;
+            hitEffect = Fx.casing3Double;
+            bounceEffect = Fx.none;
+            frontColor = Color.darkGray;
+            backColor = Color.purple.lerp(Color.black, 0.75f);
+            status = RustingStatusEffects.umbrafliction;
+            statusDuration = 3600;
             width = 10;
             height = 12;
             lifetime = 35;
@@ -60,28 +181,23 @@ public class RustingBullets implements ContentList{
             bounciness = 0.95;
         }};
 
-        fraeShard = new BounceBulletType(10, 25, "bullet"){{
-            consUpdate = new Cons<Bullet>() {
-                @Override
-                public void get(Bullet bullet) {
-                    fossilShard.create(bullet.owner, bullet.team, bullet.x, bullet.y, bullet.rotation() - 90, Mathr.helix(7, 1, bullet.fin()));
-                    fossilShard.create(bullet.owner, bullet.team, bullet.x, bullet.y, bullet.rotation() + 90, Mathr.helix(7, 1, bullet.fin()));
-                }
-            };
-            despawnEffect = Fx.plasticburn;
-            hitEffect = Fx.plasticExplosion;
-            bounceEffect = Fx.plasticburn;
-            status = StatusEffects.corroded;
-            statusDuration = 7200;
-            width = 10;
-            height = 12;
-            lifetime = 20;
-            hitEffect = Fx.hitFuse;
-            trailLength = 0;
-            bounciness = 1;
+        craeBolt = new LightningBulletType(){{
+            damage = 15;
+            lightningDamage = 35f;
+            lightningLength = 12;
+            lightningColor = Color.sky.lerp(Pal.lightTrail, 0.05f);
         }};
 
-        UnitTypes.alpha.weapons.get(0).bullet = fraeShard;
+        paveBolt = new LaserBoltBulletType(5.2f, 14){{
+            lifetime = 15f;
+            healPercent = 1f;
+            collidesTeam = true;
+            backColor = Pal.heal;
+            frontColor = Color.white;
+        }};
+
+        UnitTypes.alpha.weapons.get(0).bullet = darkShard;
+        UnitTypes.alpha.weapons.get(0).reload = 10;
         UnitTypes.beta.weapons.get(0).bullet = fossilShard;
         UnitTypes.gamma.weapons.get(0).bullet = mhenShard;
     }

@@ -5,6 +5,7 @@ import mindustry.ctype.ContentList;
 import mindustry.mod.Mod;
 
 import rusting.content.*;
+import rusting.type.Capsule;
 
 public class EndlessRusting extends Mod{
     public static String modname = "endless-rusting";

@@ -15,18 +15,21 @@ import arc.util.io.Writes;
 import mindustry.core.UI;
 import mindustry.entities.bullet.BulletType;
 import mindustry.entities.bullet.LightningBulletType;
+import mindustry.game.Team;
 import mindustry.gen.Building;
+import mindustry.gen.Groups;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.ui.Bar;
-import mindustry.world.*;
-import mindustry.world.meta.*;
+import mindustry.world.Block;
+import mindustry.world.Tile;
+import mindustry.world.meta.BlockGroup;
+import mindustry.world.meta.Stat;
 import rusting.content.RustingBullets;
 import rusting.entities.holder.CustomStatHolder;
 
-import static mindustry.Vars.tilesize;
-import static mindustry.Vars.world;
+import static mindustry.Vars.*;
 
 public class PulseBlock extends Block{
 
@@ -57,6 +60,8 @@ public class PulseBlock extends Block{
     public float projectileChanceModifier = 1;
     //how far away the laser is from the block, is used for drawing to and from block,
     public float laserOffset = 3;
+    //self explanatory
+    public boolean needsResearching = true;
     //regions for charge and shake
     TextureRegion chargeRegion, shakeRegion;
     //colours for charge
@@ -108,21 +113,45 @@ public class PulseBlock extends Block{
     }
 
     @Override
+    public boolean canPlaceOn(Tile tile, Team team){
+        //must have been researched, but for now checks if research center exists
+        if(tile == null || (needsResearching && !researched(this, team))) return false;
+        return super.canPlaceOn(tile, team);
+    }
+
+    @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
         Tile tile = world.tile(x, y);
 
-        if(tile != null && canOverload) {
-            Lines.stroke(1f);
-            Draw.color(Pal.placing);
-            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, projectileRange(), chargeColourStart.lerp(chargeColourEnd, 0.5f));
-            Draw.reset();
+        if(tile != null) {
+            if(canOverload){
+                Lines.stroke(1f);
+                Draw.color(Pal.placing);
+                Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, projectileRange(), chargeColourStart.lerp(chargeColourEnd, 0.5f));
+                Draw.reset();
+            }
+            if(!canPlaceOn(tile, player.team()) && needsResearching){
+                drawPlaceText(Core.bundle.get("bar.requitesresearching"), x, y, valid);
+            }
         }
     }
 
     //note: only used for display
     public float projectileRange(){
         return (float) (projectile instanceof LightningBulletType ? (projectile.lightningLength * 2 + projectile.lightningLengthRand) * tilesize : projectile.range() * size * 0.8);
+    }
+
+    public static boolean researched(PulseBlock block, Team team){
+        return getCenterTeam(team) != null;
+    }
+
+    public static PulseResearchBlock.PulseResearchBuild getCenterTeam(Team team){
+        final PulseResearchBlock.PulseResearchBuild[] returnBuilding = {null};
+        Groups.build.each(e -> {
+            if(e != null && e.team == team && e instanceof PulseResearchBlock.PulseResearchBuild) returnBuilding[0] = (PulseResearchBlock.PulseResearchBuild) e;
+        });
+        return returnBuilding[0];
     }
 
     public class PulseBlockBuild extends Building {

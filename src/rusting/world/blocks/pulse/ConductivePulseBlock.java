@@ -1,12 +1,6 @@
 package rusting.world.blocks.pulse;
 
-import arc.math.Mathf;
-import arc.util.Log;
-import mindustry.Vars;
-import mindustry.gen.Building;
 import mindustry.world.meta.Stat;
-
-import static mindustry.Vars.tilesize;
 
 //preferably used for batteries since syphons are unlocked later
 public class ConductivePulseBlock extends PulseBlock{
@@ -35,7 +29,7 @@ public class ConductivePulseBlock extends PulseBlock{
         @Override
         public void updateTile(){
             super.updateTile();
-            if(reload >= reloadTime) {
+            if(reload >= reloadTime){
                 reload = 0;
                 addPulseAdjacent();
             }

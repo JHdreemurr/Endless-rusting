@@ -7,5 +7,6 @@
   "main": "rusting.EndlessRusting",
   "minGameVersion": "126.2",
   "hidden": false,
-  "java": true
+  "java": true,
+  "repo": "Sh1penfire/Endless-rusting"
 }

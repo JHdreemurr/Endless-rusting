@@ -141,7 +141,8 @@ public class RustingBlocks implements ContentList{
         }};
 
         pulseResearchCenter = new PulseResearchBlock("pulse-research-center"){{
-            requirements(Category.effect, with(Items.copper, 60, Items.lead, 70, Items.silicon, 50));
+            requirements(Category.effect, with(Items.copper, 1));
+            alwaysUnlocked = true;
             size = 2;
             fieldNames.add("pulseStorage");
             fieldNames.add("canOverload");
@@ -175,15 +176,16 @@ public class RustingBlocks implements ContentList{
             requirements(Category.effect, with(Items.copper, 60, Items.lead, 70, Items.silicon, 50));
             powerLoss = 0.0000155f;
             minRequiredPulsePercent = 0.5f;
-            pulseReloadTime = 115;
+            pulseReloadTime = 165;
             connectionsPotential = 4;
             energyTransmission = 0.5f;
             pulseStorage = 70;
             overloadCapacity = 30;
             laserRange = 10;
             laserOffset = 9;
-            healPercent = 8;
-            healPercentFalloff = healPercent/4;
+            healingPercentCap = 13;
+            healPercent = 26;
+            healPercentFalloff = healPercent/3;
             overdrivePercent = 65;
             size = 2;
         }};

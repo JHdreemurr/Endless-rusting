@@ -6,16 +6,16 @@ import arc.input.KeyCode;
 import arc.math.Mathf;
 import arc.scene.event.ClickListener;
 import arc.scene.event.HandCursorListener;
+import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.Image;
 import arc.scene.ui.Tooltip;
 import arc.scene.ui.layout.Table;
 import arc.struct.OrderedMap;
 import arc.struct.Seq;
-import arc.util.Log;
-import arc.util.Scaling;
-import arc.util.Time;
+import arc.util.*;
 import mindustry.Vars;
 import mindustry.ctype.UnlockableContent;
+import mindustry.game.Team;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.graphics.Pal;
@@ -24,10 +24,7 @@ import mindustry.ui.Fonts;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.world.Block;
 import mindustry.world.Tile;
-import mindustry.world.meta.Stat;
-import mindustry.world.meta.StatCat;
-import mindustry.world.meta.StatValue;
-import mindustry.world.meta.Stats;
+import mindustry.world.meta.*;
 import rusting.graphics.ResearchCenterUI;
 
 import static mindustry.Vars.*;
@@ -37,15 +34,17 @@ public class PulseResearchBlock extends PulseBlock{
     public Seq<Block> blocks = new Seq();
     public int threshold = 2;
     public Seq<String> fieldNames = new Seq();
-    public BaseDialog dialog;
-    public BaseDialog blockDialog;
+    public BaseDialog dialog, blockDialog, unlockDialog;
     public boolean dialogSetup = false;
     public Seq<String> randomQuotes = new Seq();
     public Seq<String> databaseQuotes = new Seq();
+    public TextureRegionDrawable unlockIcon;
 
     public PulseResearchBlock(String name) {
         super(name);
         configurable = true;
+        needsResearching = false;
+        destructible = false;
     }
 
     @Override
@@ -56,9 +55,31 @@ public class PulseResearchBlock extends PulseBlock{
 
         blockDialog = new BaseDialog(Core.bundle.get("erui.pulseblockpage"));
         blockDialog.addCloseButton();
+
+        unlockDialog = new BaseDialog(Core.bundle.get("erui.unlockquestion"));
+        unlockDialog.addCloseButton();
+
+        unlockIcon = new TextureRegionDrawable().set(Core.atlas.find(name + "-charged"));
+    }
+
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+        Tile tile = world.tile(x, y);
+        if(getCenterTeam(player.team()) != null){
+            drawPlaceText(Core.bundle.get("bar.centeralreadybuilt"), x, y, valid);
+        }
+    }
+
+    @Override
+    public boolean canPlaceOn(Tile tile, Team team){
+        //must have been researched, but for now checks if research center exists
+        if(getCenterTeam(team) != null) return false;
+        return super.canPlaceOn(tile, team);
     }
 
     public void loadBlockList() {
+        blocks.clear();
         Vars.content.blocks().each(b -> {
             int fields = 0;
             for (String field : fieldNames) {
@@ -141,18 +162,29 @@ public class PulseResearchBlock extends PulseBlock{
                 table.row();
             }
 
-            if(content instanceof PulseBlock) ResearchCenterUI.displayCustomStats(table, (PulseBlock) content, randomQuotes);
+            if(content instanceof PulseBlock) {
+                ResearchCenterUI.displayCustomStats(table, (PulseBlock) content, randomQuotes);
+                /*table.button("cease", unlockIcon, () -> {
+                }).fillX().height(34f);*/
+            };
 
         });
 
         blockDialog.show();
     }
 
+    public void showUnlockDialog(UnlockableContent content){
+
+        unlockDialog.cont.clear();
+        unlockDialog.cont.margin(30);
+        unlockDialog.show();
+    }
+
     public void makelist(Tile tile) throws NoSuchFieldException{
 
         loadBlockList();
 
-        dialog.cont.clear();
+        dialog.cont.reset();
         dialog.cont.margin(20);
         dialog.cont.pane(table -> {
 
@@ -163,16 +195,17 @@ public class PulseResearchBlock extends PulseBlock{
 
                 table.table(list -> {
 
-                    int cols = Mathf.clamp((Core.graphics.getWidth() - 30) / (32 + 10), 1, 6);
+                    int cols = Mathf.clamp((Core.graphics.getWidth() - 30) / (32 + 10), 1, 5);
                     final int[] count = {0};
 
                     list.left();
 
                     blocks.each(type -> {
 
-                    UnlockableContent unlock = (UnlockableContent) type;
+                    UnlockableContent unlock = type;
 
-                    Image image = unlocked(unlock) ? new Image(unlock.icon(Cicon.medium)).setScaling(Scaling.fit) : new Image(Icon.lock, Pal.gray);
+                    Image image = new Image(unlock.icon(Cicon.medium)).setScaling(Scaling.fit);
+                    if(!unlocked(type)) image.color.lerp(Pal.darkerGray, 0.85f);
                     list.add(image).size(8 * 12).pad(3);
                     ClickListener listener = new ClickListener();
                     image.addListener(listener);
@@ -181,17 +214,18 @@ public class PulseResearchBlock extends PulseBlock{
                         image.update(() -> image.color.lerp(!listener.isOver() ? Color.white : chargeColourEnd, Mathf.clamp(0.4f * Time.delta)));
                     }
 
-                    if (unlocked(unlock)) {
-                        image.clicked(() -> {
+                    image.clicked(() -> {
+                        if(unlocked(unlock)) {
                             if (Core.input.keyDown(KeyCode.shiftLeft) && Fonts.getUnicode(unlock.name) != 0) {
                                 Core.app.setClipboardText((char) Fonts.getUnicode(unlock.name) + "");
                                 ui.showInfoFade("@copied");
                             } else {
                                 showBlockEntry(unlock);
                             }
-                        });
-                        image.addListener(new Tooltip(t -> t.background(Tex.button).add(unlock.localizedName)));
-                    }
+                        }
+                        else showUnlockDialog(unlock);
+                    });
+                    image.addListener(new Tooltip(t -> t.background(Tex.button).add((unlocked(unlock) ? "The " : "Unlock the ") + unlock.localizedName + (unlocked(unlock) ? "" : "?"))));
 
                     if ((++count[0]) % cols == 0) {
                         list.row();
@@ -211,7 +245,7 @@ public class PulseResearchBlock extends PulseBlock{
         Vars.control.input.frag.config.hideConfig();
         if(!(tile.build instanceof PulseResearchBuild)) return;
         try{
-            if(!dialogSetup) makelist(tile);
+            makelist(tile);
         }
         catch (NoSuchFieldException e){
             Log.info(e);

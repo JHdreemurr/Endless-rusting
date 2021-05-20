@@ -22,6 +22,21 @@ jar {
     archiveFileName.set pArtifactFilename
 }
 
+class helloTask extends DefaultTask{
+    String greeting = "2";
+    @TaskAction
+    def greet(){
+        println(greeting + ", hello from extended class!");
+    }
+}
+
+task hello(type: helloTask){
+    greeting = "oh, hi there"
+    doLast {
+        println("hello world!");
+    }
+}
+
 task dexify(type: Jar) {
     archiveName "dexed-$pArtifactFilename"
 

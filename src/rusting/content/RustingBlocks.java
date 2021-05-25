@@ -4,28 +4,44 @@ import arc.graphics.Color;
 import arc.struct.Seq;
 import mindustry.content.Fx;
 import mindustry.content.Items;
-import mindustry.ctype.*;
+import mindustry.ctype.ContentList;
 import mindustry.gen.Sounds;
 import mindustry.graphics.Pal;
-import mindustry.type.Category;
-import mindustry.world.*;
+import mindustry.type.*;
+import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.PowerTurret;
-import mindustry.world.meta.*;
-import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.environment.Floor;
+import mindustry.world.blocks.environment.StaticWall;
+import mindustry.world.meta.Attribute;
 import rusting.entities.holder.PanelHolder;
 import rusting.entities.holder.ShootingPanelHolder;
 import rusting.world.blocks.defense.turret.PanelTurret;
 import rusting.world.blocks.pulse.*;
 
-import static mindustry.type.ItemStack.*;
+import static mindustry.type.ItemStack.with;
 
 public class RustingBlocks implements ContentList{
     public static Block
         //environment
-        paileanStolnen, paileanPathen,
+        paileanStolnen, paileanPathen, paileanWallen,
         //pulse
-        pulseGenerator, pulseNode, pulseTesla, pulseResonator, pulseSiphon, pulseBarrier, pulseBarrierLarge, pulseResearchCenter, pulseUpkeeper,
+        //Pulse collection
+        pulseGenerator, pulseCollector,
+        //Nodes
+        pulseNode, pulseTesla,
+        //Storage
+        pulseResonator,
+        //Siphon
+        pulseSiphon,
+        //Defense
+        pulseBarrier, pulseBarrierLarge,
+        //Research
+        pulseResearchCenter,
+        //Suport
+        pulseUpkeeper,
         //turrets
+        //environment/turrets
+        archangel,
         //pannel turrets
         prikend, prsimdeome, prefraecon, pafleaver;
         
@@ -45,14 +61,35 @@ public class RustingBlocks implements ContentList{
             attributes.set(Attribute.heat, 0.075f);
             blendGroup = paileanStolnen;
         }};
-        
+
+        paileanWallen = new StaticWall("pailean-wallen"){{
+            variants = 2;
+        }};
+
         //endregion
 
         //region pulse
 
         //Generates pulse. Quite good at storing pulse, but expensive
+        pulseCollector = new PulseGenerator("pulse-collector"){{
+            requirements(Category.power, with(Items.copper, 35, Items.coal, 15, Items.titanium, 10));
+            centerResearchRequirements = with(Items.copper, 100,  Items.coal, 50, Items.titanium, 25);
+            size = 1;
+            canOverload = false;
+            configurable = false;
+            productionTime = 30;
+            pulseAmount = 2.5f;
+            connectionsPotential = 0;
+            connectable = false;
+            pulseStorage = 15;
+            resistance = 0.75;
+            laserOffset = 4;
+        }};
+
+        //Generates pulse. Quite good at storing pulse, but expensive
         pulseGenerator = new PulseGenerator("pulse-generator"){{
-            requirements(Category.power, with(Items.copper, 90, Items.silicon, 25, Items.titanium, 45));
+            requirements(Category.power, with(Items.copper, 90, Items.silicon, 55, Items.titanium, 45));
+            centerResearchRequirements = with(Items.copper, 350,  Items.coal, 95, Items.graphite, 55, Items.titanium, 225);
             size = 3;
             canOverload = true;
             overloadCapacity = 25;
@@ -63,27 +100,30 @@ public class RustingBlocks implements ContentList{
             connectionsPotential = 3;
             pulseStorage = 75;
             resistance = 0.25;
-            productionTime = 25;
             laserOffset = 10;
             laserRange = 7;
         }};
 
         //Loses power fast, but is great at transmitting pulses to far blocks.
         pulseNode = new PulseNode("pulse-node"){{
-            requirements(Category.power, with(Items.copper, 90, Items.silicon, 25, Items.titanium, 45));
+            requirements(Category.power, with(Items.copper, 5, Items.lead, 4, Items.titanium, 3));
+            centerResearchRequirements = with(Items.copper, 120, Items.lead, 95, Items.titanium, 65);
+            size = 1;
+            alwaysUnlocked = true;
             powerLoss = 0.0025f;
             pulseReloadTime = 15;
             energyTransmission = 3f;
             pulseStorage = 25;
             resistance = 0.075;
             laserRange = 13;
-            size = 1;
             canOverload = false;
         }};
 
         //Shoots lightning around itself when overloaded. Easly overloads. Acts as a large power node, with two connections, but slower reload
         pulseTesla = new PulseNode("pulse-tesla"){{
-            requirements(Category.power, with(Items.copper, 90, Items.silicon, 25, Items.titanium, 45));
+            requirements(Category.power, with(Items.copper, 85, Items.lead, 65, Items.graphite, 25, Items.titanium, 20));
+            centerResearchRequirements = with(Items.copper, 365, Items.lead, 125, Items.coal, 85, Items.titanium, 80);
+            size = 2;
             projectile = RustingBullets.craeBolt;
             projectileChanceModifier = 0.15f;
             powerLoss = 0.00835f;
@@ -96,54 +136,57 @@ public class RustingBlocks implements ContentList{
             resistance = 0.075;
             laserOffset = 3;
             laserRange = 18;
-            size = 2;
             canOverload = true;
         }};
 
         //stores power for later usage less effectively than nodes, but stores more power. Transmits power to blocks nearby with less pulse power percentage.
         pulseResonator = new ConductivePulseBlock("pulse-resonator"){{
-            requirements(Category.power, with(Items.copper, 90, Items.silicon, 25, Items.titanium, 45));
+            requirements(Category.power, with(Items.copper, 35, Items.silicon, 20, Items.titanium, 10));
+            centerResearchRequirements = with(Items.copper, 175, Items.coal, 35, Items.silicon, 90, Items.titanium, 65);
+            size = 1;
             powerLoss = 0.00425f;
             resistance = 0;
             pulseStorage = 175;
-            size = 1;
             canOverload = false;
         }};
 
         pulseSiphon = new PulseSiphon("pulse-siphon"){{
-            requirements(Category.power, with(Items.copper, 90, Items.silicon, 25, Items.titanium, 45));
+            requirements(Category.power, with(Items.copper, 10, Items.silicon, 20, Items.titanium, 15));
+            centerResearchRequirements = with(Items.copper, 125,  Items.coal, 65, Items.graphite, 45, Items.titanium, 35);
+            size = 1;
             powerLoss = 0.000035f;
             siphonAmount = 1.5f;
             pulseReloadTime = 35;
             pulseStorage = 35;
             laserRange = 6;
             canOverload = false;
-            size = 1;
-
         }};
 
         pulseBarrier = new PulseBlock("pulse-barrier"){{
-            requirements(Category.defense, with(Items.copper, 90, Items.silicon, 25, Items.titanium, 45));
+            requirements(Category.defense, with(Items.copper, 8, Items.graphite, 6, Items.titanium, 5));
+            centerResearchRequirements = with(Items.copper, 115, Items.coal, 65, Items.titanium, 30);
             size = 1;
-            health = 350 * size * size;
+            health = 410 * size * size;
             powerLoss = 0.000035f;
             pulseStorage = 35;
             canOverload = false;
         }};
 
         pulseBarrierLarge = new PulseBlock("pulse-barrier-large"){{
-            requirements(Category.defense, with(Items.copper, 90, Items.silicon, 25, Items.titanium, 45));
+            requirements(Category.defense, with(Items.copper, 32, Items.graphite, 24, Items.titanium, 20));
+            centerResearchRequirements = with(Items.copper, 450, Items.graphite, 75, Items.titanium, 120);
             size = 2;
-            health = 350 * size * size;
+            health = 410 * size * size;
             powerLoss = 0.000035f;
             pulseStorage = 35;
             canOverload = false;
         }};
 
         pulseResearchCenter = new PulseResearchBlock("pulse-research-center"){{
-            requirements(Category.effect, with(Items.copper, 1));
-            alwaysUnlocked = true;
+            requirements(Category.effect, with(Items.copper, 65, Items.lead, 50, Items.coal, 25));
+            centerResearchRequirements = with(Items.copper, 40,  Items.coal, 15);
             size = 2;
+            alwaysUnlocked = true;
             fieldNames.add("pulseStorage");
             fieldNames.add("canOverload");
             //totally random ;)
@@ -173,7 +216,9 @@ public class RustingBlocks implements ContentList{
         }};
 
         pulseUpkeeper = new PulseChainNode("pulse-upkeeper"){{
-            requirements(Category.effect, with(Items.copper, 60, Items.lead, 70, Items.silicon, 50));
+            requirements(Category.effect, with(Items.copper, 95, Items.lead, 75, Items.silicon, 45, Items.titanium, 25));
+            centerResearchRequirements = with(Items.copper, 550,  Items.coal, 355, Items.metaglass, 100, Items.graphite, 125, Items.titanium, 225);
+            size = 2;
             powerLoss = 0.0000155f;
             minRequiredPulsePercent = 0.5f;
             pulseReloadTime = 165;
@@ -187,7 +232,25 @@ public class RustingBlocks implements ContentList{
             healPercent = 26;
             healPercentFalloff = healPercent/3;
             overdrivePercent = 65;
-            size = 2;
+        }};
+
+        archangel = new DysfunctionalMonolith("archangel"){{
+            requirements(Category.effect, with(Items.copper, 300, Items.lead, 70, Items.metaglass, 50));
+            centerResearchRequirements = with(Items.copper, 350,  Items.coal, 95, Items.graphite, 55, Items.titanium, 225);
+            size = 3;
+            health = 135 * size * size;
+            projectile = RustingBullets.craeWeaver;
+            projectileChanceModifier = 0;
+            reloadTime = 85;
+            shots = 2;
+            bursts = 3;
+            burstSpacing = 3;
+            inaccuracy = 5;
+            pulseStorage = 70;
+            overloadCapacity = 30;
+            powerLoss = 0;
+            minRequiredPulsePercent = 0;
+            canOverload = true;
         }};
         //endregion
 

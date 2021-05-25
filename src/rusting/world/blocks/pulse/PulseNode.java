@@ -6,7 +6,6 @@ import arc.graphics.g2d.Lines;
 import arc.math.Mathf;
 import arc.math.geom.Geometry;
 import arc.struct.Seq;
-import arc.util.Log;
 import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
@@ -18,7 +17,8 @@ import mindustry.graphics.Pal;
 import mindustry.world.Tile;
 import mindustry.world.meta.Stat;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.tilesize;
+import static mindustry.Vars.world;
 
 //a block which can connect to other pulse blocks and transmit a pulse
 public class PulseNode extends PulseBlock{
@@ -124,6 +124,7 @@ public class PulseNode extends PulseBlock{
 
         @Override
         public boolean onConfigureTileTapped(Building other){
+
             if(this == other){
                 deselect();
                 return false;
@@ -131,8 +132,10 @@ public class PulseNode extends PulseBlock{
 
             if(nodeCanConnect(this, other) || connections.contains(other)){
                 configure(other.pos());
+
                 return false;
             }
+
 
             return super.onConfigureTileTapped(other);
         }
@@ -144,7 +147,7 @@ public class PulseNode extends PulseBlock{
             if(loadSeq.size > 0){
                 for(int i = 0; i < loadSeq.size; i++){
                     i++;
-                    onConfigureTileTapped(Vars.world.build(loadSeq.get(i - 1), loadSeq.get(i)));
+                    if(!connections.contains(Vars.world.build(loadSeq.get(i - 1), loadSeq.get(i)))) connections.add(Vars.world.build(loadSeq.get(i - 1), loadSeq.get(i)));
                 }
                 loadSeq.clear();
             }
@@ -199,7 +202,7 @@ public class PulseNode extends PulseBlock{
             super.draw();
             connections.each(other -> {
                 if(other == null || other.isNull() || !other.isAdded()) return;
-                drawLaser((PulseBlockBuild) other, laserColor, chargeColourEnd);
+                drawLaser((PulseBlockBuild) other, chargef(), laserColor, chargeColourEnd);
             });
         }
 

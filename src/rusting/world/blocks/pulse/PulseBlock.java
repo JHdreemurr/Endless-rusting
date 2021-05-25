@@ -2,32 +2,29 @@ package rusting.world.blocks.pulse;
 
 import arc.Core;
 import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.Fill;
-import arc.graphics.g2d.Lines;
-import arc.graphics.g2d.TextureRegion;
+import arc.graphics.g2d.*;
 import arc.math.Angles;
 import arc.math.Mathf;
-import arc.util.Nullable;
-import arc.util.Time;
+import arc.util.*;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
+import mindustry.content.Items;
 import mindustry.core.UI;
 import mindustry.entities.bullet.BulletType;
 import mindustry.entities.bullet.LightningBulletType;
 import mindustry.game.Team;
 import mindustry.gen.Building;
 import mindustry.gen.Groups;
-import mindustry.graphics.Drawf;
-import mindustry.graphics.Layer;
-import mindustry.graphics.Pal;
+import mindustry.graphics.*;
+import mindustry.type.ItemStack;
 import mindustry.ui.Bar;
 import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.meta.BlockGroup;
 import mindustry.world.meta.Stat;
+import rusting.content.Palr;
 import rusting.content.RustingBullets;
-import rusting.entities.holder.CustomStatHolder;
+import rusting.entities.holder.*;
 
 import static mindustry.Vars.*;
 
@@ -60,12 +57,16 @@ public class PulseBlock extends Block{
     public float projectileChanceModifier = 1;
     //how far away the laser is from the block, is used for drawing to and from block,
     public float laserOffset = 3;
+    //custom consumer module used purely to store values
+    CustomConsumerModule customConsumes = new CustomConsumerModule();
     //self explanatory
     public boolean needsResearching = true;
+    //requirements to be researched
+    public ItemStack[] centerResearchRequirements = ItemStack.with(Items.copper, 1);
     //regions for charge and shake
     TextureRegion chargeRegion, shakeRegion;
     //colours for charge
-    public Color chargeColourStart = Color.cyan.lerp(Pal.thoriumPink, 0.25f), chargeColourEnd = Color.sky.lerp(Pal.lightTrail, 0.05f).lerp(Color.valueOf("#a4ddf2"), 0.05f);
+    public Color chargeColourStart = Palr.pulseChargeStart, chargeColourEnd = new Color(Color.sky).lerp(Pal.lightTrail, 0.25f).lerp(Color.valueOf("#a4ddf2"), 0.05f);
 
     public PulseBlock(String name){
         super(name);
@@ -106,7 +107,7 @@ public class PulseBlock extends Block{
         super.setBars();
         bars.add("power", entity -> new Bar(() ->
                 Core.bundle.format("bar.pulsebalance", UI.formatAmount((int)(((PulseBlockBuild) entity).pulseEnergy/pulseStorage * 60))),
-                () -> chargeColourStart.lerp(chargeColourEnd,
+                () -> Tmp.c1.set(chargeColourStart).lerp(chargeColourEnd,
                          ((PulseBlockBuild) entity).chargef()),
                 () -> Mathf.clamp(((PulseBlockBuild) entity).chargef())
         ));
@@ -115,7 +116,7 @@ public class PulseBlock extends Block{
     @Override
     public boolean canPlaceOn(Tile tile, Team team){
         //must have been researched, but for now checks if research center exists
-        if(tile == null || (needsResearching && !researched(this, team))) return false;
+        if(tile == null || (needsResearching && !PulseResearchBlock.researched(this, team))) return false;
         return super.canPlaceOn(tile, team);
     }
 
@@ -125,24 +126,28 @@ public class PulseBlock extends Block{
         Tile tile = world.tile(x, y);
 
         if(tile != null) {
-            if(canOverload){
+            if(canShoot()){
                 Lines.stroke(1f);
                 Draw.color(Pal.placing);
-                Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, projectileRange(), chargeColourStart.lerp(chargeColourEnd, 0.5f));
+                Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, projectileRange(), chargeColourEnd);
                 Draw.reset();
             }
             if(!canPlaceOn(tile, player.team()) && needsResearching){
-                drawPlaceText(Core.bundle.get("bar.requitesresearching"), x, y, valid);
+                drawPlaceText(Core.bundle.get(validCenter(player.team()) ? "bar.requitesresearching" : "bar.dosnthavecenter"), x, y, valid);
             }
         }
     }
 
     //note: only used for display
     public float projectileRange(){
-        return (float) (projectile instanceof LightningBulletType ? (projectile.lightningLength * 2 + projectile.lightningLengthRand) * tilesize : projectile.range() * size * 0.8);
+        return (float) (projectile instanceof LightningBulletType ? (projectile.lightningLength * 2 + projectile.lightningLengthRand) * tilesize : projectile.range() * size * 0.6);
     }
 
-    public static boolean researched(PulseBlock block, Team team){
+    public boolean canShoot(){
+        return canOverload;
+    }
+
+    public static boolean validCenter(Team team){
         return getCenterTeam(team) != null;
     }
 
@@ -162,6 +167,14 @@ public class PulseBlock extends Block{
 
         public float pulseEfficiency(){
             return Math.max(baseEfficiency, chargef(false) * timeScale());
+        }
+
+        public void customConsume(){
+            pulseEnergy -= customConsumes.pulse;
+        }
+
+        public boolean customConsumeValid(){
+            return pulseEnergy >= customConsumes.pulse;
         }
 
         public boolean canRecievePulse(double charge){
@@ -204,7 +217,7 @@ public class PulseBlock extends Block{
 
         public void overloadEffect(){
             //for now, sprays projectiles around itself, and damages itself.
-            if(Mathf.chance(overloadChargef() * projectileChanceModifier)) projectile.create(this, team, x, y, Mathf.random(360), (float) ((Mathf.random(0.7f) + 0.3) * size));
+            if(Mathf.chance(overloadChargef() * projectileChanceModifier)) projectile.create(this, team, x, y, Mathf.random(360), (float) ((Mathf.random(0.5f) + 0.3) * size));
         }
 
         public boolean overloaded(){
@@ -239,18 +252,18 @@ public class PulseBlock extends Block{
 
         @Override
         public void drawSelect(){
-            if(canOverload){
+            if(canShoot()){
                 Drawf.dashCircle(x, y, projectileRange(), chargeColourStart.lerp(chargeColourEnd, chargef()));
             }
             Draw.reset();
         }
 
-        public void drawLaser(PulseBlockBuild building, Color laserCol, Color laserCol2) {
+        public void drawLaser(PulseBlockBuild building, float lerpPercent, Color laserCol, Color laserCol2) {
             Draw.z(Layer.power);
             float angle = angleTo(building.x, building.y) - 90;
             float sourcx = x + Angles.trnsx(angle, 0, laserOffset), sourcy = y + Angles.trnsy(angle, 0, laserOffset);
             float edgex = building.x + Angles.trnsx(angle + 180, 0, ((PulseBlock) building.block).laserOffset), edgey = building.y + Angles.trnsy(angle + 180, 0, ((PulseBlock) building.block).laserOffset);
-            Draw.color(laserCol, laserCol2, 0.5f);
+            Draw.color(laserCol, laserCol2, lerpPercent);
             Lines.stroke(1.35f);
             Lines.line(sourcx, sourcy, edgex, edgey);
             Fill.circle(edgex, edgey, 1.35f);

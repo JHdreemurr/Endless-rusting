@@ -27,7 +27,7 @@ public class PulseChainNode extends PulseNode{
     @Override
     public void setPulseStats() {
         super.setPulseStats();
-        pStats.healPercent.setValue(Math.min(healPercent, healingPercentCap) * pulseReloadTime * 60/100);
+        pStats.healPercent.setValue(60 * 100/pulseReloadTime/Math.min(healPercent, healingPercentCap));
         pStats.overdrivePercent.setValue(overdrivePercent);
         pStats.healPercentFalloff.setValue(healPercentFalloff);
     }

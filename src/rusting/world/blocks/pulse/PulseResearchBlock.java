@@ -13,17 +13,21 @@ import arc.scene.ui.layout.Table;
 import arc.struct.OrderedMap;
 import arc.struct.Seq;
 import arc.util.*;
+import arc.util.io.Reads;
+import arc.util.io.Writes;
 import mindustry.Vars;
 import mindustry.ctype.UnlockableContent;
+import mindustry.entities.bullet.BulletType;
 import mindustry.game.Team;
-import mindustry.gen.Icon;
-import mindustry.gen.Tex;
+import mindustry.gen.*;
 import mindustry.graphics.Pal;
+import mindustry.type.ItemStack;
 import mindustry.ui.Cicon;
 import mindustry.ui.Fonts;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.world.Block;
 import mindustry.world.Tile;
+import mindustry.world.blocks.storage.CoreBlock.CoreBuild;
 import mindustry.world.meta.*;
 import rusting.graphics.ResearchCenterUI;
 
@@ -31,25 +35,36 @@ import static mindustry.Vars.*;
 
 public class PulseResearchBlock extends PulseBlock{
 
-    public Seq<Block> blocks = new Seq();
+
     public int threshold = 2;
+    public Seq<Block> blocks = new Seq();
     public Seq<String> fieldNames = new Seq();
     public BaseDialog dialog, blockDialog, unlockDialog;
     public boolean dialogSetup = false;
     public Seq<String> randomQuotes = new Seq();
     public Seq<String> databaseQuotes = new Seq();
-    public TextureRegionDrawable unlockIcon;
+    public TextureRegionDrawable unlockIcon, blockHolderIcon;
+    private Image unlockImage, blockHolderImage;
+    private ResearchBulletType researchBullet = new ResearchBulletType();
 
     public PulseResearchBlock(String name) {
         super(name);
         configurable = true;
         needsResearching = false;
         destructible = false;
+
+        config(String.class, (PulseResearchBuild entity, String contentName) -> {
+            if(!entity.researchedBlocks.contains(contentName)){
+                entity.researchedBlocks.add(contentName);
+            }
+        });
+
     }
 
     @Override
     public void load(){
         super.load();
+
         dialog = new BaseDialog(Core.bundle.get("erui.pulseblockdatabasepage"));
         dialog.addCloseButton();
 
@@ -57,15 +72,18 @@ public class PulseResearchBlock extends PulseBlock{
         blockDialog.addCloseButton();
 
         unlockDialog = new BaseDialog(Core.bundle.get("erui.unlockquestion"));
-        unlockDialog.addCloseButton();
 
         unlockIcon = new TextureRegionDrawable().set(Core.atlas.find(name + "-charged"));
+        blockHolderIcon = new TextureRegionDrawable().set(Core.atlas.find(name + "-blockholder"));
+
+        //Unchanged, so it can be defined in load
+        blockHolderImage = new Image(blockHolderIcon);
+        blockHolderImage.setSize(8 * 36);
     }
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
-        Tile tile = world.tile(x, y);
         if(getCenterTeam(player.team()) != null){
             drawPlaceText(Core.bundle.get("bar.centeralreadybuilt"), x, y, valid);
         }
@@ -93,7 +111,13 @@ public class PulseResearchBlock extends PulseBlock{
         });
     }
 
+    public void showDialog(){
+
+        dialog.show();
+    }
+
     public void showBlockEntry(UnlockableContent content){
+
         blockDialog.cont.clear();
 
         blockDialog.cont.pane(table -> {
@@ -164,19 +188,66 @@ public class PulseResearchBlock extends PulseBlock{
 
             if(content instanceof PulseBlock) {
                 ResearchCenterUI.displayCustomStats(table, (PulseBlock) content, randomQuotes);
-                /*table.button("cease", unlockIcon, () -> {
-                }).fillX().height(34f);*/
-            };
+            }
 
         });
 
         blockDialog.show();
     }
 
-    public void showUnlockDialog(UnlockableContent content){
+    public void showUnlockDialog(UnlockableContent content, Tile tile){
 
-        unlockDialog.cont.clear();
+        unlockDialog.clear();
         unlockDialog.cont.margin(30);
+        unlockDialog.addCloseButton();
+        unlockIcon.set(content.icon(Cicon.tiny));
+        unlockImage = new Image(unlockIcon).setScaling(Scaling.fit);
+        ItemStack[] rCost = ((PulseBlock) content).centerResearchRequirements;
+        Table itemsCost = new Table();
+        itemsCost.table(table -> {
+            for(ItemStack costing: rCost) {
+                Image itemImage = new Image(new TextureRegionDrawable().set(costing.item.icon(Cicon.medium))).setScaling(Scaling.fit);
+
+                table.stack(
+                        itemImage,
+                        new Table(t -> {
+                            t.add(String.valueOf(costing.amount));
+                        }).left().margin(1, 3, 2, 0)
+                ).pad(10f);
+            }
+        });
+        unlockDialog.table(table -> {
+            table.center();
+            table.right();
+            table.button("Unlock?", () -> {
+                if(tile.build instanceof PulseResearchBuild && content instanceof PulseBlock){
+                    PulseResearchBuild building = (PulseResearchBuild) tile.build;
+                    CoreBuild coreBlock = building.team.core();
+                    boolean canResearch = false;
+                    if(Vars.state.rules.infiniteResources || coreBlock.items.has(rCost, 1)){
+                        for(int i = 0; i < ((PulseBlock) content).centerResearchRequirements.length; i++){
+                            coreBlock.items.remove(((PulseBlock) content).centerResearchRequirements[i]);
+                        }
+                        building.configure(content.localizedName);
+                        Sounds.unlock.at(player.x, player.y);
+                    }
+                }
+                try {
+                    dialog.hide();
+                    makelist(tile);
+                }
+                catch (NoSuchFieldException err){
+                    Log.err(err);
+                }
+                finally {
+                    dialog.show();
+                }
+                unlockDialog.hide();
+            }).fillX().left().height(75f).width(145).pad(120).padBottom(264);
+            table.add(itemsCost).height(75f).width(145).pad(15).padBottom(230);
+            table.stack(unlockImage/*, blockHolderImage*/).size(8 * 12).fillX().left().pad(90).padBottom(264);
+        });
+
         unlockDialog.show();
     }
 
@@ -203,29 +274,37 @@ public class PulseResearchBlock extends PulseBlock{
                     blocks.each(type -> {
 
                     UnlockableContent unlock = type;
-
+                    if(!unlocked(unlock)) return;
+                    boolean isResearched = false;
+                    if(tile.build instanceof PulseResearchBuild){
+                        isResearched = researched(unlock, (PulseResearchBuild) tile.build);
+                    }
+                    else isResearched = researched(unlock, player.team());
                     Image image = new Image(unlock.icon(Cicon.medium)).setScaling(Scaling.fit);
-                    if(!unlocked(type)) image.color.lerp(Pal.darkerGray, 0.85f);
+                    Color imageCol = isResearched ? Color.white : Pal.darkerGray;
                     list.add(image).size(8 * 12).pad(3);
                     ClickListener listener = new ClickListener();
                     image.addListener(listener);
-                    if (!mobile && unlocked(unlock)) {
+                    if (!mobile) {
                         image.addListener(new HandCursorListener());
-                        image.update(() -> image.color.lerp(!listener.isOver() ? Color.white : chargeColourEnd, Mathf.clamp(0.4f * Time.delta)));
+                        image.update(() -> image.color.lerp(!listener.isOver() ? imageCol : chargeColourEnd, Mathf.clamp(0.4f * Time.delta)));
                     }
 
-                    image.clicked(() -> {
-                        if(unlocked(unlock)) {
+                        boolean finalIsResearched = isResearched;
+                        image.clicked(() -> {
+                        if(unlocked(unlock)){
                             if (Core.input.keyDown(KeyCode.shiftLeft) && Fonts.getUnicode(unlock.name) != 0) {
                                 Core.app.setClipboardText((char) Fonts.getUnicode(unlock.name) + "");
                                 ui.showInfoFade("@copied");
-                            } else {
-                                showBlockEntry(unlock);
                             }
+
+                            else if(finalIsResearched) showBlockEntry(unlock);
+
+                            else showUnlockDialog(unlock, tile);
                         }
-                        else showUnlockDialog(unlock);
                     });
-                    image.addListener(new Tooltip(t -> t.background(Tex.button).add((unlocked(unlock) ? "The " : "Unlock the ") + unlock.localizedName + (unlocked(unlock) ? "" : "?"))));
+                        boolean finalIsResearched1 = isResearched;
+                        image.addListener(new Tooltip(t -> t.background(Tex.button).add((finalIsResearched1 ? "The " : "Unlock the ") + unlock.localizedName + (finalIsResearched1 ? "" : "?"))));
 
                     if ((++count[0]) % cols == 0) {
                         list.row();
@@ -241,7 +320,17 @@ public class PulseResearchBlock extends PulseBlock{
         return (!Vars.state.isCampaign() && !Vars.state.isMenu()) || content.unlocked();
     }
 
-    public void buildDialog(Tile tile) throws Exception{
+    public static boolean researched(UnlockableContent content, Team team){
+            return getCenterTeam(team) != null && getCenterTeam(team).researchedBlocks.contains(content.localizedName) || state.rules.infiniteResources;
+    }
+
+    public static boolean researched(UnlockableContent content, PulseResearchBuild building){
+        boolean returnBool = false;
+        returnBool = building.researchedBlocks.contains(content.localizedName) || state.rules.infiniteResources;
+        return returnBool;
+    }
+
+    public void buildDialog(Tile tile){
         Vars.control.input.frag.config.hideConfig();
         if(!(tile.build instanceof PulseResearchBuild)) return;
         try{
@@ -251,21 +340,49 @@ public class PulseResearchBlock extends PulseBlock{
             Log.info(e);
         }
         finally {
-            dialog.show();
+            showDialog();
+        }
+    }
+
+    public class ResearchBulletType extends BulletType{
+        @Override
+        public Bullet create(Entityc owner, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data) {
+            Building build = world.buildWorld(x, y);
+            if(build instanceof PulseResearchBuild && data instanceof String) ((PulseResearchBuild) build).researchedBlocks.add((String) data);
+            return Bullet.create();
         }
     }
 
     public class PulseResearchBuild extends PulseBlockBuild{
+        public Seq<String> researchedBlocks = new Seq<>();
 
         public void buildConfiguration(Table table){
             super.buildConfiguration(table);
             table.button(Icon.pencil, () -> {
-                try {
-                    buildDialog(tile);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                buildDialog(tile);
             }).size(40f);
+            table.button(Icon.eraser, () -> {
+                buildDialog(tile);
+            }).size(40f);
+        }
+
+        @Override
+        public void write(Writes w) {
+            super.write(w);
+            w.d(researchedBlocks.size);
+            researchedBlocks.each(block -> {
+                w.str(block);
+            });
+        }
+
+        @Override
+        public void read(Reads r, byte revision) {
+            super.read(r, revision);
+            //might mess up any classes which extend off this, only keep temporarily or have one block
+            double index = r.d();
+            for(int i = 0; i < index; i++){
+                configure(r.str());
+            }
         }
     }
 }

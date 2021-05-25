@@ -23,7 +23,7 @@ public class ConductivePulseBlock extends PulseBlock{
         this.stats.add(Stat.reload, reloadTime * 60);
     }
 
-    public class ConductivePulseBlockBuild extends PulseBlockBuild{
+    public class ConductivePulseBlockBuild extends PulseBlock.PulseBlockBuild {
         public float reload = 0;
 
         @Override

@@ -4,14 +4,11 @@ import arc.func.Cons;
 import arc.graphics.Color;
 import arc.math.Mathf;
 import mindustry.Vars;
-import mindustry.content.Fx;
-import mindustry.content.StatusEffects;
-import mindustry.content.UnitTypes;
-import mindustry.ctype.*;
+import mindustry.content.*;
+import mindustry.ctype.ContentList;
 import mindustry.entities.Fires;
 import mindustry.entities.bullet.*;
 import mindustry.gen.Bullet;
-import mindustry.gen.Fire;
 import mindustry.graphics.Pal;
 import rusting.entities.bullet.BounceBulletType;
 import rusting.entities.bullet.ConsBulletType;
@@ -23,9 +20,11 @@ public class RustingBullets implements ContentList{
     //lore related bullets. The crae, raeh, mhem, frae, pave and the dark were united, until the first port's crash.
             //basic bullets
             fossilShard, craeShard, raehShard, mhenShard, fraeShard, paveShard, darkShard,
+            //missile/weaving bullets
+            craeWeaver,
             //lightning bullets
             craeBolt,
-            //
+            //laser bolt bullets
             paveBolt;
     
     @Override
@@ -53,7 +52,7 @@ public class RustingBullets implements ContentList{
             despawnEffect = Fx.plasticburn;
             bounceEffect = Fx.hitLancer;
             status = StatusEffects.shocked;
-            frontColor = Color.sky.lerp(Pal.lightTrail, 0.15f);
+            frontColor = Palr.pulseChargeStart;
             backColor = Pal.lancerLaser.lerp(Pal.lightPyraFlame, 0.3f);
             trailColor = frontColor;
             trailEffect = Fx.lightningShoot;
@@ -181,11 +180,35 @@ public class RustingBullets implements ContentList{
             bounciness = 0.95;
         }};
 
+        craeWeaver = new BounceBulletType(3, 16, "bullet"){{
+            width = 12;
+            height = 15;
+            lifetime = 45;
+            shrinkX = 1;
+            shootEffect = Fx.none;
+            hitEffect = Fx.hitLancer;
+            despawnEffect = Fx.plasticburn;
+            bounceEffect = Fx.hitFuse;
+            status = StatusEffects.shocked;
+            frontColor = Palr.pulseChargeStart;
+            backColor = Pal.lancerLaser.lerp(Pal.lightPyraFlame, 0.3f);
+            trailColor = frontColor;
+            trailEffect = Fxr.craeWeaversResidue;
+            trailChance = 0.15f;
+            trailLength = 8;
+            trailWidth = 5;
+            weaveMag = 2;
+            weaveScale = 5;
+            homingPower = 0.125f;
+            knockback = -0.15f;
+            bounciness = 0.8;
+        }};
+
         craeBolt = new LightningBulletType(){{
             damage = 15;
             lightningDamage = 35f;
             lightningLength = 12;
-            lightningColor = Color.sky.lerp(Pal.lightTrail, 0.05f);
+            lightningColor = Palr.pulseChargeStart;
         }};
 
         paveBolt = new LaserBoltBulletType(5.2f, 14){{
@@ -195,10 +218,5 @@ public class RustingBullets implements ContentList{
             backColor = Pal.heal;
             frontColor = Color.white;
         }};
-
-        UnitTypes.alpha.weapons.get(0).bullet = darkShard;
-        UnitTypes.alpha.weapons.get(0).reload = 10;
-        UnitTypes.beta.weapons.get(0).bullet = fossilShard;
-        UnitTypes.gamma.weapons.get(0).bullet = mhenShard;
     }
 }

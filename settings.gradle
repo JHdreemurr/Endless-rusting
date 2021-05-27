@@ -1,3 +1,0 @@
-include ':scr'
-findProject(':src')?.name = 'src'
-

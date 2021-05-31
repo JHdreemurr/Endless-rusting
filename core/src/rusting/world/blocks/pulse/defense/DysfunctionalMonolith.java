@@ -1,4 +1,4 @@
-package rusting.world.blocks.pulse;
+package rusting.world.blocks.pulse.defense;
 
 import arc.Core;
 import arc.audio.Sound;
@@ -14,8 +14,9 @@ import mindustry.entities.bullet.BulletType;
 import mindustry.game.Team;
 import mindustry.gen.*;
 import rusting.content.Fxr;
+import rusting.world.blocks.pulse.PulseBlock;
 
-public class DysfunctionalMonolith extends PulseBlock{
+public class DysfunctionalMonolith extends PulseBlock {
 
     //ticks before the block can shoot again
     public float reloadTime = 60;

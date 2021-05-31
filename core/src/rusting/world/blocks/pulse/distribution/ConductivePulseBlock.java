@@ -1,9 +1,10 @@
-package rusting.world.blocks.pulse;
+package rusting.world.blocks.pulse.distribution;
 
 import mindustry.world.meta.Stat;
+import rusting.world.blocks.pulse.PulseBlock;
 
 //preferably used for batteries since syphons are unlocked later
-public class ConductivePulseBlock extends PulseBlock{
+public class ConductivePulseBlock extends PulseBlock {
     //Reload of the node till it can transmit a pulse to a nearby block. Preferably not every tick
     public float reloadTime = 5;
     //How many bursts the plating sends
@@ -39,7 +40,7 @@ public class ConductivePulseBlock extends PulseBlock{
         public void addPulseAdjacent(){
             proximity().each(l -> {
                 if (pulseEnergy > 0 && l instanceof PulseBlockBuild) {
-                    float energyTransmitted = pulseEnergy >= energyTransmission ? energyTransmission : pulseEnergy;
+                    float energyTransmitted = Math.min(pulseEnergy, energyTransmission);
                     if (((PulseBlockBuild) l).canRecievePulse(energyTransmitted) && ((PulseBlockBuild) l).chargef() < chargef()) {
                         ((PulseBlockBuild) l).receivePulse(energyTransmitted, this);
                         pulseEnergy -= energyTransmitted;

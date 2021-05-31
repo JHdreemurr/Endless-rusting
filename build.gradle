@@ -18,6 +18,7 @@ repositories {
 
 dependencies {
     implementation "com.github.Anuken.Mindustry:core:$pMindustryVersion"
+    implementation "com.github.Anuken.Mindustry:annotations:$pMindustryVersion"
 }
 
 jar {
@@ -36,6 +37,16 @@ task hello(type: helloTask){
     greeting = "oh, hi there"
     doLast {
         println("hello world!");
+    }
+}
+
+class rollCredits extends DefaultTask{
+
+}
+
+task helloWorld(type: rollCredits){
+    doLast {
+        println("Never gonna give you up \nNever gonna let you down \nNever gonna run around and desert you \nNever gonna make you cry \nNever gonna say goodbye \nNever gonna tell a lie and hurt you")
     }
 }
 

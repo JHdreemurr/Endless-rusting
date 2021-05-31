@@ -21,7 +21,7 @@ public class RustingBullets implements ContentList{
             //basic bullets
             fossilShard, craeShard, raehShard, mhenShard, fraeShard, paveShard, darkShard,
             //missile/weaving bullets
-            craeWeaver,
+            craeWeaver, paveWeaver,
             //lightning bullets
             craeBolt,
             //laser bolt bullets
@@ -181,8 +181,8 @@ public class RustingBullets implements ContentList{
         }};
 
         craeWeaver = new BounceBulletType(3, 14, "bullet"){{
-            width = 12;
-            height = 15;
+            width = 15;
+            height = 18;
             lifetime = 45;
             shrinkX = 1;
             shootEffect = Fx.none;
@@ -205,6 +205,31 @@ public class RustingBullets implements ContentList{
             bounciness = 0.8;
         }};
 
+        //duplicated bullet, only to be used for duoplys
+        paveWeaver = new BounceBulletType(5, 7, "bullet"){{
+            width = 15;
+            height = 18;
+            lifetime = 35;
+            healPercent = 1f;
+            shrinkX = 1;
+            collidesTeam = true;
+            shootEffect = Fx.heal;
+            hitEffect = Fx.plasticburn;
+            despawnEffect = Fx.plasticburn;
+            backColor = Pal.heal;
+            frontColor = Color.white;
+            trailColor = frontColor;
+            trailEffect = Fx.shootHeal;
+            trailChance = 0.15f;
+            trailLength = 8;
+            trailWidth = 5;
+            weaveMag = 2;
+            weaveScale = 5;
+            homingPower = 0.325f;
+            knockback = 0.25f;
+            bounciness = 0.8;
+        }};
+
         craeBolt = new LightningBulletType(){{
             damage = 15;
             lightningDamage = 35f;
@@ -213,9 +238,10 @@ public class RustingBullets implements ContentList{
             status = RustingStatusEffects.macrosis;
         }};
 
-        paveBolt = new LaserBoltBulletType(5.2f, 14){{
+        paveBolt = new LaserBoltBulletType(5.2f, 8){{
+            recoil = 1.25f;
             lifetime = 15f;
-            healPercent = 1f;
+            healPercent = 2f;
             collidesTeam = true;
             backColor = Pal.heal;
             frontColor = Color.white;

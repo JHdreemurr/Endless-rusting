@@ -1,10 +1,7 @@
 package rusting;
 
-import arc.Events;
 import arc.struct.Seq;
-import arc.util.Log;
 import mindustry.ctype.ContentList;
-import mindustry.game.EventType;
 import mindustry.mod.Mod;
 import rusting.content.*;
 import rusting.entities.holder.ItemScoreHolder;
@@ -15,11 +12,13 @@ public class EndlessRusting extends Mod{
         new RustingStatusEffects(),
         new RustingItems(),
         new RustingBullets(),
+        new RustingUnits(),
         new RustingBlocks(),
         new RustingWeathers()
     );
 
     public EndlessRusting(){
+        /*
         Events.on(EventType.ClientLoadEvent.class,
             e -> {
                 itemScorer = new ItemScoreHolder();
@@ -29,6 +28,8 @@ public class EndlessRusting extends Mod{
                 });
             }
         );
+
+         */
     }
 
     public ItemScoreHolder itemScorer;

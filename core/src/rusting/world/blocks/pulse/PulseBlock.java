@@ -24,7 +24,9 @@ import mindustry.world.meta.BlockGroup;
 import mindustry.world.meta.Stat;
 import rusting.content.Palr;
 import rusting.content.RustingBullets;
-import rusting.entities.holder.*;
+import rusting.entities.holder.CustomConsumerModule;
+import rusting.entities.holder.CustomStatHolder;
+import rusting.world.blocks.pulse.utility.PulseResearchBlock;
 
 import static mindustry.Vars.*;
 
@@ -34,7 +36,7 @@ public class PulseBlock extends Block{
 
     public float pulseStorage = 10;
     //decreases pulse energy received
-    public double resistance = 0.1;
+    public float resistance = 0.1f;
     //decreases power over time
     public float powerLoss = 0;
     //minimum power required to work
@@ -48,7 +50,7 @@ public class PulseBlock extends Block{
     //Bool for whether block can overload. Unused by normal pulse block.
     public boolean canOverload = true;
     //how much the block can store when overloaded
-    public double overloadCapacity = 3;
+    public float overloadCapacity = 3;
     //Whether the building can be connected to by PulseNodes with power lasers
     public boolean connectable = true;
     //what the block can shoot when overloaded
@@ -66,7 +68,7 @@ public class PulseBlock extends Block{
     //requirements to be researched
     public ItemStack[] centerResearchRequirements = ItemStack.with(Items.copper, 1);
     //regions for charge and shake
-    TextureRegion chargeRegion, shakeRegion;
+    public TextureRegion chargeRegion, shakeRegion;
     //colours for charge
     public Color chargeColourStart = Palr.pulseChargeStart, chargeColourEnd = new Color(Color.sky).lerp(Pal.lightTrail, 0.25f).lerp(Color.valueOf("#a4ddf2"), 0.05f);
 
@@ -163,8 +165,8 @@ public class PulseBlock extends Block{
 
     public class PulseBlockBuild extends Building {
         public float pulseEnergy = 0;
-        public double falloff = resistance;
-        float xOffset = 0, yOffset = 0, alphaDraw = 0;
+        public float falloff = resistance;
+        public float xOffset = 0, yOffset = 0, alphaDraw = 0;
         public float shake = 0;
 
         public float pulseEfficiency(){
@@ -183,7 +185,7 @@ public class PulseBlock extends Block{
             return customConsumeValid() && ((team == Team.derelict || (team == state.rules.waveTeam && cruxInfiniteConsume)) && !state.rules.pvp || consValid());
         }
 
-        public boolean canRecievePulse(double charge){
+        public boolean canRecievePulse(float charge){
             return charge + pulseEnergy < pulseStorage + (canOverload ? overloadCapacity : 0);
         }
 
@@ -191,34 +193,34 @@ public class PulseBlock extends Block{
             return connectable;
         }
 
-        public void receivePulse(double pulse, Building source){
+        public void receivePulse(float pulse, Building source){
             if(canRecievePulse(pulse)) addPulse(pulse, source);
         }
 
-        public void addPulse(double pulse){
+        public void addPulse(float pulse){
             addPulse(pulse, null);
         }
 
-        public void addPulse(double pulse, @Nullable Building building){
-            double storage = pulseStorage + (canOverload ? overloadCapacity : 0);
-            double resistAmount = (building != this ? falloff : 0);
+        public void addPulse(float pulse, @Nullable Building building){
+            float storage = pulseStorage + (canOverload ? overloadCapacity : 0);
+            float resistAmount = (building != this ? falloff : 0);
             pulseEnergy += Math.max(pulse - resistAmount, 0);
             normalizePulse();
         }
 
-        public void removePulse(double pulse){
+        public void removePulse(float pulse){
             removePulse(pulse, null);
         }
 
-        public void removePulse(double pulse, @Nullable Building building){
-            double storage = pulseStorage + (canOverload ? overloadCapacity : 0);
+        public void removePulse(float pulse, @Nullable Building building){
+            float storage = pulseStorage + (canOverload ? overloadCapacity : 0);
             pulseEnergy -= pulse;
             normalizePulse();
         }
 
         public void normalizePulse(){
-            double storage = pulseStorage + (canOverload ? overloadCapacity : 0);
-            pulseEnergy = Math.max(Math.min(pulseEnergy, (float) storage), 0);
+            float storage = pulseStorage + (canOverload ? overloadCapacity : 0);
+            pulseEnergy = Math.max(Math.min(pulseEnergy, storage), 0);
         }
 
         public void overloadEffect(){
@@ -230,12 +232,12 @@ public class PulseBlock extends Block{
             return pulseEnergy > pulseStorage && canOverload;
         }
 
-        public double overloadChargef(){
+        public float overloadChargef(){
             return (pulseEnergy - pulseStorage)/overloadCapacity;
         }
 
         public float chargef(boolean overloadaccount){
-            return pulseEnergy/(pulseStorage + (float) (canOverload && overloadaccount? overloadCapacity : 0));
+            return pulseEnergy/(pulseStorage + (canOverload && overloadaccount ? overloadCapacity : 0));
         }
 
         public float chargef(){

@@ -1,23 +1,33 @@
 package rusting.content;
 
 import arc.graphics.Color;
+import arc.struct.EnumSet;
 import arc.struct.Seq;
 import mindustry.content.*;
 import mindustry.ctype.ContentList;
 import mindustry.gen.Sounds;
 import mindustry.graphics.CacheLayer;
 import mindustry.graphics.Pal;
-import mindustry.type.Category;
+import mindustry.type.*;
 import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.PowerTurret;
 import mindustry.world.blocks.environment.Floor;
 import mindustry.world.blocks.environment.StaticWall;
 import mindustry.world.meta.Attribute;
+import mindustry.world.meta.BlockFlag;
 import rusting.entities.holder.PanelHolder;
 import rusting.entities.holder.ShootingPanelHolder;
+import rusting.world.blocks.defense.turret.HealerBeamTurret;
 import rusting.world.blocks.defense.turret.PanelTurret;
 import rusting.world.blocks.environment.FixedOreBlock;
-import rusting.world.blocks.pulse.*;
+import rusting.world.blocks.pulse.PulseBlock;
+import rusting.world.blocks.pulse.defense.DysfunctionalMonolith;
+import rusting.world.blocks.pulse.distribution.*;
+import rusting.world.blocks.pulse.production.PulseGenerator;
+import rusting.world.blocks.pulse.unit.PulseReconstructor;
+import rusting.world.blocks.pulse.unit.PulseUnitFactory;
+import rusting.world.blocks.pulse.utility.PulseChainNode;
+import rusting.world.blocks.pulse.utility.PulseResearchBlock;
 
 import static mindustry.type.ItemStack.with;
 
@@ -51,6 +61,10 @@ public class RustingBlocks implements ContentList{
         //turrets
         //environment/turrets
         archangel,
+        //units
+        pulseFactory, enlightenmentReconstructor, ascendanceReconstructor,
+        //healer turrets
+        thrum,
         //pannel turrets
         prikend, prsimdeome, prefraecon, pafleaver;
         
@@ -136,7 +150,7 @@ public class RustingBlocks implements ContentList{
             connectionsPotential = 0;
             connectable = false;
             pulseStorage = 15;
-            resistance = 0.75;
+            resistance = 0.75f;
             laserOffset = 4;
         }};
 
@@ -154,7 +168,7 @@ public class RustingBlocks implements ContentList{
             energyTransmission = 4.5f;
             connectionsPotential = 3;
             pulseStorage = 75;
-            resistance = 0.25;
+            resistance = 0.25f;
             laserOffset = 10;
             laserRange = 7;
         }};
@@ -169,7 +183,7 @@ public class RustingBlocks implements ContentList{
             pulseReloadTime = 15;
             energyTransmission = 3f;
             pulseStorage = 25;
-            resistance = 0.075;
+            resistance = 0.075f;
             laserRange = 13;
             canOverload = false;
         }};
@@ -188,7 +202,7 @@ public class RustingBlocks implements ContentList{
             energyTransmission = 10f;
             pulseStorage = 45;
             overloadCapacity = 15;
-            resistance = 0.075;
+            resistance = 0.075f;
             laserOffset = 3;
             laserRange = 18;
             canOverload = true;
@@ -292,6 +306,7 @@ public class RustingBlocks implements ContentList{
         archangel = new DysfunctionalMonolith("archangel"){{
             requirements(Category.effect, with(Items.copper, 300, Items.lead, 115, Items.metaglass, 50, Items.titanium, 45));
             centerResearchRequirements = with(Items.copper, 350,  Items.coal, 95, Items.graphite, 55, Items.titanium, 225);
+            flags = EnumSet.of(BlockFlag.turret);
             size = 3;
             health = 135 * size * size;
             projectile = RustingBullets.craeWeaver;
@@ -309,12 +324,77 @@ public class RustingBlocks implements ContentList{
             minRequiredPulsePercent = 0;
             canOverload = true;
         }};
-        //endregion
+
+        //region units
+
+        pulseFactory = new PulseUnitFactory("pulse-factory"){{
+            requirements(Category.units, with(Items.copper, 75, Items.lead, 60, Items.coal, 35, Items.titanium, 25));
+            centerResearchRequirements = with(Items.copper, 145,  Items.lead, 145, Items.graphite, 55, Items.titanium, 85, Items.pyratite, 35);
+            customConsumes.pulse = 10f;
+            powerLoss = 0.00155f;
+            minRequiredPulsePercent = 0.35f;
+            laserOffset = 8f;
+            pulseStorage = 55;
+            overloadCapacity = 25;
+            size = 3;
+            plans.add(new UnitPlan(RustingUnits.duono, 1920, ItemStack.with(Items.lead, 25, Items.silicon, 35, Items.titanium, 10)));
+        }};
+
+        enlightenmentReconstructor = new PulseReconstructor("enlightenment-reconstructor") {{
+            requirements(Category.units, with(Items.copper, 135, Items.lead, 85, Items.silicon, 45, Items.titanium, 35));
+            centerResearchRequirements = with(Items.copper, 450,  Items.lead, 375, Items.silicon, 145, Items.titanium, 135, Items.pyratite, 75, RustingItems.melonaleum, 45);
+            consumes.items(ItemStack.with(Items.silicon, 35, Items.titanium, 15, RustingItems.melonaleum, 10));
+            customConsumes.pulse = 25f;
+            powerLoss = 0.00155f;
+            minRequiredPulsePercent = 0.65f;
+            laserOffset = 8f;
+            pulseStorage = 85;
+            canOverload = false;
+            size = 3;
+            upgrades.add(
+                new UnitType[]{RustingUnits.duono, RustingUnits.duoly}
+            );
+            constructTime = 720;
+        }};
+
+        ascendanceReconstructor = new PulseReconstructor("ascendance-reconstructor") {{
+            requirements(Category.units, with(Items.lead, 465, Items.metaglass, 245, Items.pyratite, 85, Items.titanium, 85));
+            centerResearchRequirements = with(Items.lead, 1255, Items.silicon, 455, Items.titanium, 235, Items.pyratite, 145, RustingItems.melonaleum, 125);
+            consumes.items(ItemStack.with(Items.silicon, 65, Items.titanium, 25, Items.pyratite, 5, RustingItems.melonaleum, 15));
+            customConsumes.pulse = 65f;
+            powerLoss = 0.00155f;
+            minRequiredPulsePercent = 0.55f;
+            laserOffset = 8f;
+            pulseStorage = 145;
+            canOverload = false;
+            size = 5;
+            upgrades.add(
+                    new UnitType[]{RustingUnits.duoly, RustingUnits.duanga}
+            );
+            constructTime = 720;
+        }};
+
+        //endregion pulse
 
         //region turrets
 
+        thrum = new HealerBeamTurret("thrum"){{
+            requirements(Category.turret, with(Items.copper, 60, Items.lead, 25, Items.silicon, 25));
+            health = 220;
+            size = 1;
+            reloadTime = 60;
+            inaccuracy = 7.5f;
+            range = 150;
+            shootCone = 1;
+            powerUse = 0.5f;
+            rotateSpeed = 10;
+            healing = 40;
+            targetAir = true;
+            targetGround = true;
+        }};
+
         prikend = new PowerTurret("prikend"){{
-            requirements(Category.turret, with(Items.copper, 60, Items.lead, 70, Items.silicon, 50));
+            requirements(Category.turret, with(Items.copper, 60, Items.lead, 45, Items.silicon, 35));
             range = 185f;
             shootLength = 2;
             chargeEffects = 7;
@@ -335,9 +415,8 @@ public class RustingBlocks implements ContentList{
             inaccuracy = 2;
         }};
 
-        //region turrets
         prsimdeome = new PanelTurret("prsimdeome"){{
-            requirements(Category.turret, with(Items.copper, 60, Items.lead, 70, Items.silicon, 50));
+            requirements(Category.turret, with(Items.copper, 85, Items.lead, 70, Items.silicon, 50, RustingItems.bulastelt, 35));
             range = 165f;
             chargeEffects = 7;
             recoilAmount = 2f;
@@ -365,7 +444,7 @@ public class RustingBlocks implements ContentList{
         }};
 
         prefraecon = new PanelTurret("prefraecon"){{
-            requirements(Category.turret, with(Items.copper, 60, Items.lead, 70, Items.silicon, 50));
+            requirements(Category.turret, with(Items.titanium, 115, Items.silicon, 65, RustingItems.bulastelt, 55, RustingItems.melonaleum, 45));
             range = 200f;
             recoilAmount = 2f;
             reloadTime = 65f;
@@ -376,7 +455,7 @@ public class RustingBlocks implements ContentList{
             heatColor = Pal.darkPyraFlame;
             size = 3;
             health = 280 * size * size;
-            shootSound = Sounds.flame2;
+            shootSound = Sounds.release;
             shootType = RustingBullets.fraeShard;
             panels.add(
                 new PanelHolder(name){{
@@ -387,7 +466,7 @@ public class RustingBlocks implements ContentList{
         }};
 
         pafleaver  = new PanelTurret("pafleaver"){{
-            requirements(Category.turret, with(Items.copper, 60, Items.lead, 70, Items.silicon, 50));
+            //requirements(Category.turret, with(Items.copper, 60, Items.lead, 70, Items.silicon, 50));
             range = 260f;
             recoilAmount = 2f;
             reloadTime = 60f;

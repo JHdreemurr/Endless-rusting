@@ -1,11 +1,13 @@
-package rusting.world.blocks.pulse;
+package rusting.world.blocks.pulse.utility;
 
 import arc.struct.Seq;
+import mindustry.Vars;
 import mindustry.content.Fx;
 import mindustry.gen.Building;
 import rusting.content.RustingBullets;
+import rusting.world.blocks.pulse.distribution.PulseNode;
 
-public class PulseChainNode extends PulseNode{
+public class PulseChainNode extends PulseNode {
 
     //How much of a block's health it can heal
     public float healPercent;
@@ -51,16 +53,17 @@ public class PulseChainNode extends PulseNode{
             mended.clear();
         }
 
-        public void affectChainConnected(Seq<Building> connectedTargets, float healingPercent, float overdrivePercent){
+        public void affectChainConnected(Seq<Integer> connectedTargets, float healingPercent, float overdrivePercent){
             float trueHealingPercent = healPercent / Math.max(1, connectedTargets.size);
             connectedTargets.each(l -> {
-                if (trueHealingPercent <= 0 || mended.contains(l)) return;
-                mended.add(l);
-                l.healFract(Math.min(trueHealingPercent, healingPercentCap) / 100);
-                l.applyBoost(overdrivePercent, pulseReloadTime + 1f);
-                if (l.healthf() != 1) Fx.healBlockFull.at(l.x, l.y, l.block.size, chargeColourEnd);
-                else Fx.healBlock.at(l.x, l.y, l.block.size, chargeColourStart);
-                if (l instanceof PulseNodeBuild && ((PulseNode) l.block).connectionsPotential > 0 && trueHealingPercent > 0) affectChainConnected(((PulseNodeBuild) l).connections, Math.max(trueHealingPercent - healPercentFalloff, 0), overdrivePercent);
+                Building j = Vars.world.build(l);
+                if (trueHealingPercent <= 0 || mended.contains(j)) return;
+                mended.add(j);
+                j.healFract(Math.min(trueHealingPercent, healingPercentCap) / 100);
+                j.applyBoost(overdrivePercent, pulseReloadTime + 1f);
+                if (j.healthf() != 1) Fx.healBlockFull.at(j.x, j.y, j.block.size, chargeColourEnd);
+                else Fx.healBlock.at(j.x, j.y, j.block.size, chargeColourStart);
+                if (j instanceof PulseNodeBuild && ((PulseNode) j.block).connectionsPotential > 0 && trueHealingPercent > 0) affectChainConnected(((PulseNodeBuild) j).connections, Math.max(trueHealingPercent - healPercentFalloff, 0), overdrivePercent);
             });
         }
 

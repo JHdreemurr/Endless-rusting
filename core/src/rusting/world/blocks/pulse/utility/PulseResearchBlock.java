@@ -1,4 +1,4 @@
-package rusting.world.blocks.pulse;
+package rusting.world.blocks.pulse.utility;
 
 import arc.Core;
 import arc.graphics.Color;
@@ -30,10 +30,11 @@ import mindustry.world.Tile;
 import mindustry.world.blocks.storage.CoreBlock.CoreBuild;
 import mindustry.world.meta.*;
 import rusting.graphics.ResearchCenterUI;
+import rusting.world.blocks.pulse.PulseBlock;
 
 import static mindustry.Vars.*;
 
-public class PulseResearchBlock extends PulseBlock{
+public class PulseResearchBlock extends PulseBlock {
 
 
     public int threshold = 2;
@@ -211,7 +212,7 @@ public class PulseResearchBlock extends PulseBlock{
                 table.stack(
                         itemImage,
                         new Table(t -> {
-                            t.add(String.valueOf(costing.amount));
+                            t.add(costing.amount + "/" + Math.min(tile.build.team.core().items.get(costing.item), costing.amount));
                         }).left().margin(1, 3, 2, 0)
                 ).pad(10f);
             }

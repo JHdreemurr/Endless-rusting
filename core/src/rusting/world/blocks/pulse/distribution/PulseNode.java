@@ -1,4 +1,4 @@
-package rusting.world.blocks.pulse;
+package rusting.world.blocks.pulse.distribution;
 
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
@@ -9,19 +9,19 @@ import arc.struct.Seq;
 import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
-import mindustry.Vars;
 import mindustry.game.Team;
 import mindustry.gen.Building;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Pal;
 import mindustry.world.Tile;
 import mindustry.world.meta.Stat;
+import rusting.world.blocks.pulse.PulseBlock;
 
 import static mindustry.Vars.tilesize;
 import static mindustry.Vars.world;
 
 //a block which can connect to other pulse blocks and transmit a pulse
-public class PulseNode extends PulseBlock{
+public class PulseNode extends PulseBlock {
     //Reload of the node till it can transmit a pulse to a nearby block
     public float pulseReloadTime = 60;
     //How many bursts the node sends
@@ -52,12 +52,12 @@ public class PulseNode extends PulseBlock{
         config(Integer.class, (PulseNodeBuild entity, Integer i) -> {
             Building other = world.build(i);
             if(!(other instanceof PulseBlockBuild)) return;
-            if(entity.connections.contains(other)){
+            if(entity.connections.contains(i)){
                 //unlink
-                entity.connections.remove(other);
+                entity.connections.remove(i);
             }
             else if(nodeCanConnect(entity, other)){
-                entity.connections.add(other);
+                entity.connections.add(i);
             }
         });
     }
@@ -91,7 +91,7 @@ public class PulseNode extends PulseBlock{
     }
 
     public static boolean nodeCanConnect(PulseNodeBuild build, Building target){
-        return (target instanceof PulseBlockBuild ? ((PulseBlockBuild) target).connectableTo() : true) && !build.connections.contains(target) & build.connections.size < ((PulseNode) (build.block)).connectionsPotential && ((PulseNode) build.block).laserRange * 8 >= Mathf.dst(build.x, build.y, target.x, target.y);
+        return (!(target instanceof PulseBlockBuild) || ((PulseBlockBuild) target).connectableTo()) && !build.connections.contains(target.pos()) & build.connections.size < ((PulseNode) (build.block)).connectionsPotential && ((PulseNode) build.block).laserRange * 8 >= Mathf.dst(build.x, build.y, target.x, target.y);
     }
 
     protected void getPotentialLinks(PulseNode.PulseNodeBuild build, Team team, Seq<Building> others){
@@ -114,7 +114,7 @@ public class PulseNode extends PulseBlock{
 
 
     public class PulseNodeBuild extends PulseBlock.PulseBlockBuild{
-        public Seq<Building> connections = new Seq();
+        public Seq<Integer> connections = new Seq();
         public Seq<Integer> loadSeq = new Seq<>();
         public float reload = 0;
 
@@ -130,7 +130,7 @@ public class PulseNode extends PulseBlock{
                 return false;
             }
 
-            if(nodeCanConnect(this, other) || connections.contains(other)){
+            if(nodeCanConnect(this, other) || connections.contains(other.pos())){
                 configure(other.pos());
 
                 return false;
@@ -144,19 +144,13 @@ public class PulseNode extends PulseBlock{
         public void updateTile() {
             super.updateTile();
 
-            if(loadSeq.size > 0){
-                for(int i = 0; i < loadSeq.size; i++){
-                    i++;
-                    if(!connections.contains(Vars.world.build(loadSeq.get(i - 1), loadSeq.get(i)))) connections.add(Vars.world.build(loadSeq.get(i - 1), loadSeq.get(i)));
-                }
-                loadSeq.clear();
-            }
-
             connections.each(l -> {
-                if(l == null || l.isNull() || !l.isAdded()) {
+                Building j = world.build(l);
+                if(j == null || j.isNull() || !j.isAdded()) {
                     connections.remove(l);
                 }
             });
+
             if(reload >= pulseReloadTime && chargef(true) >= minRequiredPulsePercent) {
                 interactConnected();
                 reload = 0;
@@ -171,12 +165,13 @@ public class PulseNode extends PulseBlock{
         public void addPulseConnected(){
             final int[] index = {0};
             connections.each(l -> {
+                Building j = world.build(l);
                 //need to double check, jic, because I've experienced crashes while a generator was pumping out energy
-                if(pulseEnergy < 0 || l == null) return;
+                if(pulseEnergy < 0 || j == null) return;
                 if(index[0] > connectionsPotential) connections.remove(l);
                 float energyTransmitted = Math.min(pulseEnergy, energyTransmission);
-                if(((PulseBlockBuild)l).canRecievePulse(energyTransmitted)){
-                    ((PulseBlockBuild) l).receivePulse(energyTransmitted, this);
+                if(((PulseBlockBuild)j).canRecievePulse(energyTransmitted)){
+                    ((PulseBlockBuild) j).receivePulse(energyTransmitted, this);
                     pulseEnergy -= energyTransmitted;
                 }
                 index[0]++;
@@ -190,7 +185,8 @@ public class PulseNode extends PulseBlock{
             Drawf.circles(x, y, (float) (laserRange * tilesize));
 
 
-            connections.each(link -> {
+            connections.each(l -> {
+                Building link = world.build(l);
                 Drawf.square(link.x, link.y, link.block.size * tilesize / 2f + 1f, Pal.place);
             });
 
@@ -200,7 +196,8 @@ public class PulseNode extends PulseBlock{
         @Override
         public void draw() {
             super.draw();
-            connections.each(other -> {
+            connections.each(l -> {
+                Building other = world.build(l);
                 if(other == null || other.isNull() || !other.isAdded()) return;
                 drawLaser((PulseBlockBuild) other, chargef(), laserColor, chargeColourEnd);
             });
@@ -212,8 +209,7 @@ public class PulseNode extends PulseBlock{
             w.f(reload);
             w.s(connections.size);
             for(int i = 0;  i < connections.size; i++){
-                w.d(connections.get(i).x);
-                w.d(connections.get(i).y);
+                w.d(connections.get(i));
             }
         }
 
@@ -222,13 +218,12 @@ public class PulseNode extends PulseBlock{
             super.read(read, revision);
             reload = read.f();
             int n = read.s();
-            connections = new Seq<>();
+            connections = new Seq<Integer>();
             connections.clear();
-            int rx, ry;
+            int rpos;
             for(int i = 0;  i < n; i++){
-                rx = (int) (read.d()/8);
-                ry = (int) (read.d()/8);
-                loadSeq.add(rx, ry);
+                rpos = ((int) read.d());
+                connections.add(rpos);
             }
         }
     }

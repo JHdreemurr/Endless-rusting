@@ -20,7 +20,7 @@ public class RustingWeathers implements ContentList{
         fossilStorm = new BulletParticleWeather("fossil-storm"){{
             particleBullet = RustingBullets.fossilShard;
             dynamicSpawning = true;
-            chanceSpawn = 1;
+            chanceSpawn = 4;
             randRange = new Vec2(4, 4);
             color = noiseColor = Color.valueOf("#c4cf6f");
             particleRegion = "particle";
@@ -41,13 +41,15 @@ public class RustingWeathers implements ContentList{
             duration = 2 * Time.toMinutes;
             attrs.set(Attribute.light, -0.4f);
             attrs.set(Attribute.water, -0.2f);
-            attrs.set(Attribute.water, -0.2f);
         }};
 
         corrosiveDeluge = new BulletParticleWeather("corrosive-deluge") {{
             color = noiseColor = regionColour = Color.coral;
             dynamicSpawning = false;
             chanceSpawn = 0;
+            attrs.set(Attribute.light, 0.75f);
+            attrs.set(Attribute.light, 0.15f);
+            attrs.set(Attribute.water, 0.35f);
         }};
     }
 }

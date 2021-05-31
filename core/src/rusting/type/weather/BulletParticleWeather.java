@@ -11,9 +11,7 @@ import mindustry.Vars;
 import mindustry.content.Blocks;
 import mindustry.game.Team;
 import mindustry.entities.bullet.*;
-import mindustry.gen.Groups;
-import mindustry.gen.Unit;
-import mindustry.gen.WeatherState;
+import mindustry.gen.*;
 import mindustry.graphics.MultiPacker;
 import mindustry.type.weather.ParticleWeather;
 import rusting.EndlessRusting;
@@ -83,7 +81,7 @@ public class BulletParticleWeather extends ParticleWeather {
             rny = rny * 8;
             if(Vars.world.tile(rnx/8, rny/8).block() == Blocks.air) {
                 if (Mathf.chance(dynamicSpawning ? chance * chanceSpawn: chanceSpawn)) {
-                    particleBullet.create(null, Team.derelict, (float) rnx + Mathf.random(randRange.x), (float) rny + Mathf.random(randRange.y), state.windVector.angle(), particleBullet.damage, (float) (chance * chance * 4), (float) 1, state);
+                    Call.createBullet(particleBullet, Team.derelict, (float) rnx + Mathf.random(randRange.x), (float) rny + Mathf.random(randRange.y), state.windVector.angle(), particleBullet.damage, (float) (chance * chance * 4), (float) 1);
                     particleBullet.hitEffect.at(rnx, rny);
                 }
             }

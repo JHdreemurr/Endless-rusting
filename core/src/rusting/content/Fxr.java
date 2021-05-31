@@ -13,6 +13,7 @@ import mindustry.graphics.Pal;
 import static arc.graphics.g2d.Draw.alpha;
 import static arc.graphics.g2d.Draw.color;
 import static arc.graphics.g2d.Lines.lineAngle;
+import static arc.math.Angles.angle;
 import static arc.math.Angles.randLenVectors;
 
 public class Fxr{
@@ -111,13 +112,13 @@ public class Fxr{
         });
     }),
 
-    craeWeaverShards = new Effect(75f, e -> {
+    craeWeaverShards = new Effect(125f, e -> {
         color(Palr.pulseChargeStart, Color.sky, Palr.pulseChargeEnd, e.fin() * e.fin());
         Draw.alpha(e.fout() * e.fout());
         for(int i = 0; i < 3; i++){
-            float tnx = Angles.trnsx(i * 120 + e.finpow() * 360, 0, 3), tny = Angles.trnsy(i * 90 + e.finpow() * 360, 0, 3);
-            randLenVectors(e.id, 2, e.fin() * 6 + 5, i * 90 - 90, 2, (x, y) -> {
-                Lines.lineAngle(e.x + tnx + x, e.y + tny + y, 0, e.fout() * e.fout());
+            float tnx = Angles.trnsx(i * 120 + e.finpow() * 360 + e.rotation - 90, 0, 5), tny = Angles.trnsy(i * 120 + e.finpow() * 360 + e.rotation - 90, 0, 5);
+            randLenVectors(e.id, 2, e.fin() * 6 + 5, i * 120 + e.rotation - 90, 2, (x, y) -> {
+                Lines.lineAngle(e.x + tnx + x, e.y + tny + y, angle(x, y) - 90, e.fout() * e.fout());
             });
         }
     });

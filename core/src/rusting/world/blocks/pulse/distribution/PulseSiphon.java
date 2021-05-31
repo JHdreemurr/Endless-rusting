@@ -1,4 +1,4 @@
-package rusting.world.blocks.pulse;
+package rusting.world.blocks.pulse.distribution;
 
 import mindustry.world.meta.Stat;
 

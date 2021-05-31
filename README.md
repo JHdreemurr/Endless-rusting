@@ -28,6 +28,9 @@ Note: Preferably use the plain jar for windows. If you're compiling for an andro
 
 ## Mechanics
 
+### Researchable Blocks ingame
+This one's a big one. Certain blocks now require both researching in the Tech tree (In campaign) and researching ingame to use. This will Stop you from simply rushing down the new Technology. To compensate though, the researchable blocks are stronger than their vanilla counterparts, or feature some new mechanic. Most research costs are below a thousand of one materiel, though they tend to be mixed depending on the block's usage and practical applications.
+
 ### Pulse
 A weird substance which is simulated by mindustry, and is colletable from the air.
 Used in various tech, such as defense, production and support

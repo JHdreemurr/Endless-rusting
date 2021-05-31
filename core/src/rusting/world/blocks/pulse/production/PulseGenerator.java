@@ -1,8 +1,9 @@
-package rusting.world.blocks.pulse;
+package rusting.world.blocks.pulse.production;
 
 import mindustry.world.meta.Stat;
+import rusting.world.blocks.pulse.distribution.PulseNode;
 
-public class PulseGenerator extends PulseNode{
+public class PulseGenerator extends PulseNode {
 
     public float pulseAmount = 1;
     public float productionTime = 30;

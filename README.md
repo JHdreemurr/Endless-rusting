@@ -1,4 +1,4 @@
-https://github.com/Sh1penfire/Endless-rusting/blob/master/core/assets/icon.png
+![image](https://user-images.githubusercontent.com/73347888/120126920-1c456d80-c201-11eb-8ad6-0a68377922ce.png)
 # Endless Rusting
 
 ## About

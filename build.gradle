@@ -19,6 +19,7 @@ repositories {
 dependencies {
     implementation "com.github.Anuken.Mindustry:core:$pMindustryVersion"
     implementation "com.github.Anuken.Mindustry:annotations:$pMindustryVersion"
+    implementation "com.github.Anuken.Arc:arc-core:5a9d95001fc988df2681616ebc33152b9c88ea92"
 }
 
 jar {

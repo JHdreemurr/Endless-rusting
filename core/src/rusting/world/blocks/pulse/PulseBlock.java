@@ -9,7 +9,6 @@ import arc.util.*;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.content.Items;
-import mindustry.core.UI;
 import mindustry.entities.bullet.BulletType;
 import mindustry.entities.bullet.LightningBulletType;
 import mindustry.game.Team;
@@ -112,7 +111,7 @@ public class PulseBlock extends Block{
     public void setBars(){
         super.setBars();
         bars.add("power", entity -> new Bar(() ->
-                Core.bundle.format("bar.pulsebalance", UI.formatAmount((int)(((PulseBlockBuild) entity).pulseEnergy/pulseStorage * 60))),
+                Core.bundle.get("bar.pulsebalance"),
                 () -> Tmp.c1.set(chargeColourStart).lerp(chargeColourEnd,
                          ((PulseBlockBuild) entity).chargef()),
                 () -> Mathf.clamp(((PulseBlockBuild) entity).chargef())

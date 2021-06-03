@@ -35,6 +35,7 @@ public class RustingUnits implements ContentList{
      * Setups all entity IDs and maps them into {@link EntityMapping}.
      * @author GlennFolker
      */
+
     private static void setupID(){
         for(
                 int i = 0,
@@ -89,6 +90,8 @@ public class RustingUnits implements ContentList{
             pulseStorage = 25;
             repairRange = 40;
 
+            constructor = CraeUnitEntity::new;
+
             abilities.add(
                     new UpkeeperFieldAbility(4.35f, 135, 45, 4f)
             );
@@ -122,6 +125,8 @@ public class RustingUnits implements ContentList{
 
             pulseStorage = 65;
             repairRange = 50;
+
+            constructor = CraeUnitEntity::new;
 
             abilities.add(
                     new UpkeeperFieldAbility(5.5f, 175, 55, 7f)
@@ -160,6 +165,8 @@ public class RustingUnits implements ContentList{
             repairRange = 90;
             pulseAmount = 3.25f;
             pulseGenRange = 120;
+
+            constructor = CraeUnitEntity::new;
 
             abilities.add(
                 new HealthEqualizerAbility(){{

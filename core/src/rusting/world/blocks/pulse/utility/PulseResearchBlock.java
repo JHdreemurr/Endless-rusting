@@ -24,12 +24,12 @@ import mindustry.graphics.Pal;
 import mindustry.type.ItemStack;
 import mindustry.ui.Cicon;
 import mindustry.ui.Fonts;
-import mindustry.ui.dialogs.BaseDialog;
 import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.blocks.storage.CoreBlock.CoreBuild;
 import mindustry.world.meta.*;
 import rusting.graphics.ResearchCenterUI;
+import rusting.ui.dialog.CustomBaseDialog;
 import rusting.world.blocks.pulse.PulseBlock;
 
 import static mindustry.Vars.*;
@@ -40,7 +40,7 @@ public class PulseResearchBlock extends PulseBlock {
     public int threshold = 2;
     public Seq<Block> blocks = new Seq();
     public Seq<String> fieldNames = new Seq();
-    public BaseDialog dialog, blockDialog, unlockDialog;
+    public CustomBaseDialog dialog, blockDialog, unlockDialog;
     public boolean dialogSetup = false;
     public Seq<String> randomQuotes = new Seq();
     public Seq<String> databaseQuotes = new Seq();
@@ -66,13 +66,14 @@ public class PulseResearchBlock extends PulseBlock {
     public void load(){
         super.load();
 
-        dialog = new BaseDialog(Core.bundle.get("erui.pulseblockdatabasepage"));
-        dialog.addCloseButton();
+        //dialog = new CustomBaseDialog(Core.bundle.get("erui.pulseblockdatabasepage"), Core.scene.getStyle(DialogStyle.class));
+        //dialog.addCloseButton();
 
-        blockDialog = new BaseDialog(Core.bundle.get("erui.pulseblockpage"));
-        blockDialog.addCloseButton();
+        //blockDialog = new CustomBaseDialog(Core.bundle.get("erui.pulseblockpage"), Core.scene.getStyle(DialogStyle.class));
+        //blockDialog.addCloseButton();
 
-        unlockDialog = new BaseDialog(Core.bundle.get("erui.unlockquestion"));
+        //unlockDialog = new CustomBaseDialog(Core.bundle.get("erui.unlockquestion"), Core.scene.getStyle(DialogStyle.class));
+        //unlockDialog.addCloseButton();
 
         unlockIcon = new TextureRegionDrawable().set(Core.atlas.find(name + "-charged"));
         blockHolderIcon = new TextureRegionDrawable().set(Core.atlas.find(name + "-blockholder"));
@@ -200,7 +201,6 @@ public class PulseResearchBlock extends PulseBlock {
 
         unlockDialog.clear();
         unlockDialog.cont.margin(30);
-        unlockDialog.addCloseButton();
         unlockIcon.set(content.icon(Cicon.tiny));
         unlockImage = new Image(unlockIcon).setScaling(Scaling.fit);
         ItemStack[] rCost = ((PulseBlock) content).centerResearchRequirements;

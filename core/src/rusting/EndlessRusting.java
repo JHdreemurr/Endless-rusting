@@ -8,6 +8,7 @@ import mindustry.game.EventType;
 import mindustry.mod.Mod;
 import rusting.content.*;
 import rusting.entities.holder.ItemScoreHolder;
+import rusting.graphics.Drawr;
 
 public class EndlessRusting extends Mod{
     public static String modname = "endless-rusting";
@@ -38,6 +39,7 @@ public class EndlessRusting extends Mod{
     
     @Override
     public void loadContent(){
+        Drawr.setMethods();
         contentLists.each(ContentList::load);
     }
 }

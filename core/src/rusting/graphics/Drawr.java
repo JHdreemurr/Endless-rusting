@@ -3,17 +3,52 @@ package rusting.graphics;
 
 import arc.Core;
 import arc.graphics.*;
-import arc.graphics.g2d.*;
+import arc.graphics.g2d.PixmapRegion;
+import arc.graphics.g2d.TextureRegion;
 import arc.math.geom.Vec2;
 import arc.struct.Seq;
-import arc.util.*;
+import arc.util.Log;
+import arc.util.Nullable;
+import mindustry.core.Version;
 import mindustry.type.UnitType;
 import mindustry.type.Weapon;
 import rusting.EndlessRusting;
 import rusting.entities.abilities.MountAbility;
 import rusting.math.Mathr;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 public class Drawr {
+
+    @Nullable
+    public static boolean initializedMethods = false;
+    public static Method drawingMethod = null;
+    public static boolean useNewMethods = false;
+
+    public static void setMethods(){
+        if(Version.isAtLeast("126.3")){
+            Log.info("using latest methods");
+            try {
+                drawingMethod = Pixmap.class.getDeclaredMethod("draw", Pixmap.class, int.class, int.class, int.class, int.class, int.class, int.class);
+                useNewMethods = true;
+                initializedMethods = true;
+            }
+            catch (NoSuchMethodException err){
+                Log.info("New Arc methods in Drawr #30 not suported!");
+            }
+        }
+        if(drawingMethod == null)
+            try {
+                drawingMethod = Pixmap.class.getDeclaredMethod("drawPixmap", Pixmap.class, int.class, int.class, int.class, int.class, int.class);
+                useNewMethods = false;
+                initializedMethods = true;
+            }
+            catch (NoSuchMethodException err){
+                Log.info("Old Arc methods in Drawr #42 not suported!");
+            }
+    }
+
     //Learned somewhat how to do this from sk's Drawm
     public static Pixmap pigmentae(PixmapRegion map, Color pigment, float percent){
         Pixmap stencil = new Pixmap(map.width, map.height, map.pixmap.getFormat());
@@ -78,6 +113,8 @@ public class Drawr {
 
     //oh boy, here we go again
     public static void fullSpriteGenerator(UnitType unit){
+
+        if(!initializedMethods) setMethods();
 
         Log.info("making the region for " + unit.name);
 
@@ -181,15 +218,7 @@ public class Drawr {
             for(int i = 0; i < 2; i++){
                 if(!a.mirror && i > 1) break;
                 int reverse = 1 - i * 2;
-                stencil.drawPixmap(
-                    outin,
-                    (int) (stencil.getWidth()/2 - outin.getWidth()/2 + a.x * 4 * reverse),
-                    (int) (stencil.getHeight()/2 - outin.getHeight()/2 - a.y * 4),
-                    0,
-                    0,
-                    outin.getWidth() * reverse,
-                    outin.getHeight()
-                );
+                drawPixmapUnitMount(stencil, outin, (int) a.x, (int) a.y, reverse);
             }
         });
 
@@ -214,19 +243,34 @@ public class Drawr {
             if(validateRegion(w.name)) for(int i = 0; i < 2; i++){
                 if(!w.mirror && i > 1) break;
                 int reverse = 1 - i * 2;
-                if(reverse == -1) outin = mirror(outin);
-                stencil.drawPixmap(
-                    outin,
-                    (int) (stencil.getWidth()/2 - outin.getWidth()/2 + w.x * 4 * reverse),
-                    (int) (stencil.getHeight()/2 - outin.getHeight()/2 - w.y * 4),
-                    0,
-                    0,
-                    outin.getWidth(),
-                    outin.getHeight()
-                );
+                drawPixmapUnitMount(stencil, outin, (int) w.x, (int) w.y, reverse);
             }
             if(progress < 1 && (top || pastMainRegion)) progress++;
             else done = true;
+        }
+    }
+
+    public static void drawPixmapUnitMount(Pixmap stencil, Pixmap map, int x, int y, int reverse){
+        if(useNewMethods && drawingMethod != null) {
+            try {
+                try {
+                    drawingMethod.invoke(
+                            stencil,
+                            map,
+                            stencil.getWidth() / 2 - map.getWidth() / 2 + x * 4 * reverse,
+                            stencil.getHeight() / 2 - map.getHeight() / 2 - y * 4,
+                            0,
+                            0,
+                            map.getWidth() * reverse,
+                            map.getHeight());
+                }
+                catch (InvocationTargetException err) {
+                    Log.info("Invoking Methods in Drawr #275 not suported!");
+                }
+            }
+            catch (IllegalAccessException erro){
+                Log.info("Unable to acces Methods Drawr #29!");
+            }
         }
     }
 

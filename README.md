@@ -2,7 +2,10 @@
 # Endless Rusting
 
 ## About
-Endless RUsting was origionaly made because I wanted to try learn java, but now I'm continuing to work on it because I'm finding it fun. The mod is about fleshing out the lore of PTER, and adding new mechanics which fit with vanilla.
+Endless Rusting was origionaly made because I wanted to try learn java, but now I'm continuing to work on it because I'm finding it fun. The mod is about fleshing out the lore of PTER, and adding new mechanics which fit with vanilla.
+
+## V7 Compatability
+I've got plans for full v7 compatability, though I'm not sure whats to come. Units are now compatable, and so is the dialog, but I've got to wait and see if everything works for the next BE build.
 
 ## Compiling
 

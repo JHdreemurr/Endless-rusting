@@ -35,6 +35,8 @@ public class EndlessRusting extends Mod{
     @Override
     public void init(){
         Vars.enableConsole = true;
+        Varsr.init();
+        Varsr.ui.init();
     }
     
     @Override

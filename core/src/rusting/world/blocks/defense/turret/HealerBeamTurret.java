@@ -37,6 +37,7 @@ public class HealerBeamTurret extends PowerTurret {
 
     public HealerBeamTurret(String name) {
         super(name);
+        heatColor = Pal.heal;
     }
 
     public class HealerBeamTurretBuild extends PowerTurretBuild{

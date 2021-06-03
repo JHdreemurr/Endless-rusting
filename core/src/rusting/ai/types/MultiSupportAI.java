@@ -63,7 +63,7 @@ public class MultiSupportAI extends FlyingAI {
     public void updateMovement(){
 
         boolean continueFunction = false;
-        Building core = unit.closestCore();
+        Building core = state.teams.closestCore(unit.x, unit.y, unit.team);
         Building repairPoint = (Building) targetFlag(unit.x, unit.y, BlockFlag.repair, false);
         if((unit.healthf() < 0.45f && target != null || unit.healthf() < 0.75) && (repairPoint != null || core != null)){
             Building targetBuilding = repairPoint != null ? repairPoint : core;

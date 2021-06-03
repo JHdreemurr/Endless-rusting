@@ -126,7 +126,7 @@ public class Fxr{
         }
     }),
 
-    pulseExplosion = new Effect(345f, e -> {
+    pulseSmoke = new Effect(215f, e -> {
         float nonfinalSplosionRadius = 42 + 3 * e.fout();
         int clouds = 5;
         float alphaPercent = 1;
@@ -135,20 +135,28 @@ public class Fxr{
             clouds = (int) ((CraeUnitType) e.data).hitSize/3 + 3;
         }
         final float splosionRadius = nonfinalSplosionRadius;
+
+        Draw.color(Pal.plasticSmoke, Pal.darkestGray, e.fslope() * e.fslope());
+
+        randLenVectors(e.id, clouds * 2, splosionRadius/1.5f * e.finpow() + 5, e.rotation,  360, (x, y) -> {
+            float distance = Mathf.dst(x, y);
+            Fill.circle(e.x + x,e.y + y, (1 - distance/(splosionRadius/8.5f + 5)) * e.fout() * e.fout() * 2);
+        });
+
         Draw.color(((CraeUnitType) e.data).chargeColourStart, ((CraeUnitType) e.data).chargeColourEnd, e.fin());
         Draw.alpha(alphaPercent * e.fout() * 8/10);
 
-        randLenVectors(e.id, clouds * 3, splosionRadius/4.5f * e.finpow(), e.rotation,  360, (x, y) -> {
+        randLenVectors(e.id, clouds * 3, splosionRadius/1.5f * e.finpow(), e.rotation,  360, (x, y) -> {
             float distance = Mathf.dst(x, y);
-            Draw.alpha((1 - distance/(splosionRadius/9.5f - 5)) * e.fslope() * e.fslope() * 0.85f + 0.15f * e.fout());
-            Fill.circle(e.x + x,e.y + y, splosionRadius/15f);
+            Draw.alpha((1 - distance/(splosionRadius/9.5f - 5)) * e.fout() * e.fout() * 0.15f + 0.85f * e.fout());
+            Fill.circle(e.x + x,e.y + y, splosionRadius/5f);
             Drawf.light(Team.derelict, e.x + x, e.y + y, splosionRadius/15f, Palr.pulseChargeStart, e.fout() * 0.65f);
         });
 
         randLenVectors(e.id, clouds, splosionRadius * e.finpow(), e.rotation,  360, (x, y) -> {
             float distance = Mathf.dst(x, y);
-            Draw.alpha((1 - distance/(splosionRadius/7.5f - 5)) * e.fout() * e.fout() * 0.75f + 0.25f * e.fout() * e.fout());
-            Fill.circle(e.x + x,e.y + y, splosionRadius/12.25f);
+            Draw.alpha((1 - distance/(splosionRadius/7.5f - 5)) * e.fout() * e.fout() * 0.25f + 0.75f * e.fout() * e.fout());
+            Fill.circle(e.x + x,e.y + y, splosionRadius/9.25f);
             Drawf.light(Team.derelict, e.x + x, e.y + y, splosionRadius/12.25f, Palr.pulseChargeEnd, e.fout() * 0.65f);
         });
     });

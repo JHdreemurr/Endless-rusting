@@ -84,7 +84,7 @@ public class CraeUnitEntity extends UnitEntity {
         if (!spawnedByCore) {
             Damage.dynamicExplosion(x, y, 0, explosiveness, power, bounds() / 2.0F, state.rules.damageExplosions, item().flammability > 1, team);
         }
-        Fxr.pulseExplosion.at(x, y, rotation, type);
+        Fxr.pulseSmoke.at(x, y, rotation, type);
         super.destroy();
     }
 

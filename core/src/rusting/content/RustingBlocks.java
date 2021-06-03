@@ -2,7 +2,6 @@ package rusting.content;
 
 import arc.graphics.Color;
 import arc.struct.EnumSet;
-import arc.struct.Seq;
 import mindustry.content.*;
 import mindustry.ctype.ContentList;
 import mindustry.gen.Sounds;
@@ -64,7 +63,7 @@ public class RustingBlocks implements ContentList{
         //units
         pulseFactory, enlightenmentReconstructor, ascendanceReconstructor,
         //healer turrets
-        thrum,
+        thrum, spikent,
         //pannel turrets
         prikend, prsimdeome, prefraecon, pafleaver;
         
@@ -274,30 +273,6 @@ public class RustingBlocks implements ContentList{
             alwaysUnlocked = true;
             fieldNames.add("pulseStorage");
             fieldNames.add("canOverload");
-            //totally random ;)
-
-            databaseQuotes = Seq.with(
-                "[cyan] Places of learning",
-                "[cyan] Storages of information",
-                "[cyan] Database Entries",
-                "[#d8e2e0] Welcome back."
-            );
-
-            randomQuotes = Seq.with(
-                "[cyan] E N L I G H T E N  U S",
-                "[lightgrey]Go on, there is much to teach, being of outside",
-                "[blue] T H E  P U L S E  C O N S U M E S  A L L",
-                "[black] N O T H I N G  V O I D  O F  L I G H T",
-                "[purple] R O O M B E R  S M I T H E D  T E S L A",
-                "[purple] Sometimes, the ultimate way of of winning a battle is to see how much power you still have to commit warcrimes on a daily basis",
-                "[purple] I remember the time before the great crash. It was a wonderful world, being screwed over by those who had only percipiatur.",
-                "[sky] B L I N D I N G  L I G H T",
-                "[darkgrey] E V E R Y T H I N G, S I M U L A T E D",
-                "[#d8e2e0] B E I N G  B E Y O N D  T H I S  C O N F I N E,  L I S T E N, A N D  O B E Y",
-                "[#b88041] F A D I N G  L I G H T, G U I D E  U S",
-                "[#f5bf79] Our light burns bright, now lets help reignite what was long forgotten",
-                "[red] J O I N  U S,\n T R A P P E D,  A N D  I N  A N G U I S H"
-            );
         }};
 
         pulseUpkeeper = new PulseChainNode("pulse-upkeeper"){{
@@ -399,12 +374,29 @@ public class RustingBlocks implements ContentList{
             health = 220;
             size = 1;
             reloadTime = 60;
-            inaccuracy = 7.5f;
-            range = 150;
+            range = 115;
             shootCone = 1;
             powerUse = 0.5f;
             rotateSpeed = 10;
+            squares = 3;
+            alphaFalloff = 0.65f;
+            maxEffectSize = 4;
             healing = 40;
+            targetAir = true;
+            targetGround = true;
+        }};
+
+        spikent = new HealerBeamTurret("spikent"){{
+            requirements(Category.turret, with(Items.copper, 125, Items.lead, 85, Items.silicon, 55, RustingItems.melonaleum, 35));
+            health = 650;
+            size = 2;
+            reloadTime = 35;
+            range = 150;
+            shootCone = 3;
+            powerUse = 0.8f;
+            rotateSpeed = 8;
+            alphaFalloff = 0.35f;
+            healing = 35;
             targetAir = true;
             targetGround = true;
         }};

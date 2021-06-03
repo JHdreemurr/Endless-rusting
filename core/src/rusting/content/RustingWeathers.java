@@ -13,7 +13,7 @@ import rusting.type.weather.*;
 public class RustingWeathers implements ContentList{
     public static Weather
             //destructive
-            fossilStorm, corrosiveDeluge;
+            fossilStorm, corrosiveDeluge, chemNullificationStorm;
 
     @Override
     public void load(){
@@ -44,6 +44,15 @@ public class RustingWeathers implements ContentList{
         }};
 
         corrosiveDeluge = new BulletParticleWeather("corrosive-deluge") {{
+            color = noiseColor = regionColour = Color.coral;
+            dynamicSpawning = false;
+            chanceSpawn = 0;
+            attrs.set(Attribute.light, 0.75f);
+            attrs.set(Attribute.light, 0.15f);
+            attrs.set(Attribute.water, 0.35f);
+        }};
+
+        chemNullificationStorm = new BulletParticleWeather("chem-nullification-storm") {{
             color = noiseColor = regionColour = Color.coral;
             dynamicSpawning = false;
             chanceSpawn = 0;

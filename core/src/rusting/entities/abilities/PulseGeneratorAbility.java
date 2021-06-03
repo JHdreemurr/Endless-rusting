@@ -8,11 +8,13 @@ import mindustry.Vars;
 import mindustry.gen.Unit;
 import mindustry.graphics.Layer;
 import rusting.content.Palr;
+import rusting.entities.units.CraeUnitEntity;
 import rusting.world.blocks.pulse.PulseBlock;
 import rusting.world.blocks.pulse.PulseBlock.PulseBlockBuild;
 
 public class PulseGeneratorAbility extends MountAbility {
     public float pulse;
+    public boolean distributePulse;
 
     protected float timer;
     private PulseBlockBuild building;
@@ -21,15 +23,15 @@ public class PulseGeneratorAbility extends MountAbility {
     public PulseGeneratorAbility(){
         mountName = "pulse-point";
         mirror = false;
+        distributePulse = true;
     }
 
     @Override
     public void update(Unit unit) {
         if(validate(building, unit)) {
             angle(unit.angleTo(building) - 90);
-            timer += Time.delta;
         }
-        else {
+        else{
             building = (PulseBlockBuild) Vars.indexer.findTile(unit.team, unit.x, unit.y, range, b -> b instanceof PulseBlockBuild && ((PulseBlockBuild) b).canRecievePulse(pulse));
             if(timeSincePulse >= 360) {
                 //I swear theres an easier way to do this
@@ -42,11 +44,13 @@ public class PulseGeneratorAbility extends MountAbility {
             }
             else timeSincePulse++;
         }
+        timer += Time.delta;
         if(timer >= reload){
             if(building != null) {
                 building.addPulse(pulse);
                 timeSincePulse = 0;
             }
+            else ((CraeUnitEntity) unit).addPulse(pulse);
             timer = 0;
         }
     }

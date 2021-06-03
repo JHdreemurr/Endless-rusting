@@ -67,6 +67,9 @@ public class RustingUnits implements ContentList{
 
     @Override
     public void load() {
+        setupID();
+
+        EntityMapping.nameMap.put("duono", CraeUnitEntity::new);
         duono = new CraeUnitType("duono"){{
 
             defaultController = MultiSupportAI::new;
@@ -82,8 +85,8 @@ public class RustingUnits implements ContentList{
 
             mineTier = 3;
             mineSpeed = 1.5f;
-            constructor = CraeUnitEntity::create;
 
+            pulseStorage = 25;
             repairRange = 40;
 
             abilities.add(
@@ -100,6 +103,7 @@ public class RustingUnits implements ContentList{
             );
         }};
 
+        EntityMapping.nameMap.put("duoly", CraeUnitEntity::new);
         duoly = new CraeUnitType("duoly"){{
             defaultController = MultiSupportAI::new;
 
@@ -115,8 +119,8 @@ public class RustingUnits implements ContentList{
 
             mineTier = 3;
             mineSpeed = 2.3f;
-            constructor = CraeUnitEntity::create;
 
+            pulseStorage = 65;
             repairRange = 50;
 
             abilities.add(
@@ -132,6 +136,7 @@ public class RustingUnits implements ContentList{
             );
         }};
 
+        EntityMapping.nameMap.put("duanga", CraeUnitEntity::new);
         duanga = new CraeUnitType("duanga"){{
             defaultController = MultiSupportAI::new;
 
@@ -151,8 +156,7 @@ public class RustingUnits implements ContentList{
 
             isCounted = false;
 
-            constructor = CraeUnitEntity::create;
-
+            pulseStorage = 85;
             repairRange = 90;
             pulseAmount = 3.25f;
             pulseGenRange = 120;
@@ -174,6 +178,7 @@ public class RustingUnits implements ContentList{
                     reload = 135;
                     range = 120;
                     laserOffset = 2.35f;
+                    x = 0;
                     y = -6.25f;
                 }},
                 new UpkeeperFieldAbility(7.5f, 235, 65, 6),

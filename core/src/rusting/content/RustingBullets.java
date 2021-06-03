@@ -17,7 +17,6 @@ import rusting.world.blocks.defense.turret.PanelTurret;
 
 public class RustingBullets implements ContentList{
     public static BulletType
-    //lore related bullets. The crae, raeh, mhem, frae, pave and the dark were united, until the first port's crash.
             //basic bullets
             fossilShard, craeShard, raehShard, mhenShard, fraeShard, paveShard, darkShard,
             //missile/weaving bullets

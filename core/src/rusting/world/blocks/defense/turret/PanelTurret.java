@@ -13,9 +13,7 @@ public class PanelTurret extends PowerTurret {
     @Override
     public void load() {
         super.load();
-        panels.forEach(panel -> {
-            panel.load(panel.name);
-        });
+        panels.each(PanelHolder::load);
     }
 
     public PanelTurret(String name) {
@@ -27,14 +25,14 @@ public class PanelTurret extends PowerTurret {
         @Override
         protected void shoot(BulletType type) {
             super.shoot(type);
-            panels.forEach(panel ->{
+            panels.each(panel ->{
                 if(!panel.independentBehaviour) panel.shoot(this);
             });
         }
 
         public void updateTile(){
             super.updateTile();
-            panels.forEach(panel -> {
+            panels.each(panel -> {
                 panel.update(this);
             });
         }
@@ -44,7 +42,7 @@ public class PanelTurret extends PowerTurret {
             super.draw();
             Draw.reset();
 
-            panels.forEach(panel -> {
+            panels.each(panel -> {
                 panel.draw(this);
             });
         }

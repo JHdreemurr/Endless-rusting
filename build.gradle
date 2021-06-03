@@ -26,17 +26,17 @@ jar {
 }
 
 class helloTask extends DefaultTask{
-    String greeting = "2";
+    String greeting = "2"
     @TaskAction
     def greet(){
-        println("$greeting, hello from extended class!");
+        println("$greeting, hello from extended class!")
     }
 }
 
 task hello(type: helloTask){
     greeting = "oh, hi there"
     doLast {
-        println("hello world!");
+        println("hello world!")
     }
 }
 

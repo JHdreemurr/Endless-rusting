@@ -7,8 +7,11 @@ import arc.math.Mathf;
 import arc.math.geom.Position;
 import arc.util.Tmp;
 import mindustry.entities.Effect;
+import mindustry.game.Team;
 import mindustry.gen.Bullet;
+import mindustry.graphics.Drawf;
 import mindustry.graphics.Pal;
+import rusting.entities.units.CraeUnitType;
 
 import static arc.graphics.g2d.Draw.alpha;
 import static arc.graphics.g2d.Draw.color;
@@ -121,5 +124,32 @@ public class Fxr{
                 Lines.lineAngle(e.x + tnx + x, e.y + tny + y, angle(x, y) - 90, e.fout() * e.fout());
             });
         }
+    }),
+
+    pulseExplosion = new Effect(345f, e -> {
+        float nonfinalSplosionRadius = 42 + 3 * e.fout();
+        int clouds = 5;
+        float alphaPercent = 1;
+        if(e.data instanceof CraeUnitType) {
+            nonfinalSplosionRadius = ((CraeUnitType) e.data).hitSize * 4 + 16 + ((CraeUnitType) e.data).hitSize * 2 * e.fout();
+            clouds = (int) ((CraeUnitType) e.data).hitSize/3 + 3;
+        }
+        final float splosionRadius = nonfinalSplosionRadius;
+        Draw.color(((CraeUnitType) e.data).chargeColourStart, ((CraeUnitType) e.data).chargeColourEnd, e.fin());
+        Draw.alpha(alphaPercent * e.fout() * 8/10);
+
+        randLenVectors(e.id, clouds * 3, splosionRadius/4.5f * e.finpow(), e.rotation,  360, (x, y) -> {
+            float distance = Mathf.dst(x, y);
+            Draw.alpha((1 - distance/(splosionRadius/9.5f - 5)) * e.fslope() * e.fslope() * 0.85f + 0.15f * e.fout());
+            Fill.circle(e.x + x,e.y + y, splosionRadius/15f);
+            Drawf.light(Team.derelict, e.x + x, e.y + y, splosionRadius/15f, Palr.pulseChargeStart, e.fout() * 0.65f);
+        });
+
+        randLenVectors(e.id, clouds, splosionRadius * e.finpow(), e.rotation,  360, (x, y) -> {
+            float distance = Mathf.dst(x, y);
+            Draw.alpha((1 - distance/(splosionRadius/7.5f - 5)) * e.fout() * e.fout() * 0.75f + 0.25f * e.fout() * e.fout());
+            Fill.circle(e.x + x,e.y + y, splosionRadius/12.25f);
+            Drawf.light(Team.derelict, e.x + x, e.y + y, splosionRadius/12.25f, Palr.pulseChargeEnd, e.fout() * 0.65f);
+        });
     });
 }

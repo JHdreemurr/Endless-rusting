@@ -70,7 +70,7 @@ public class PulseBlock extends Block{
     //regions for charge and shake
     public TextureRegion chargeRegion, shakeRegion;
     //colours for charge
-    public Color chargeColourStart = Palr.pulseChargeStart, chargeColourEnd = new Color(Color.sky).lerp(Pal.lightTrail, 0.25f).lerp(Color.valueOf("#a4ddf2"), 0.05f);
+    public Color chargeColourStart, chargeColourEnd;
 
     public PulseBlock(String name){
         super(name);
@@ -78,6 +78,8 @@ public class PulseBlock extends Block{
         solid = true;
         hasPower = false;
         group = BlockGroup.power;
+        chargeColourStart = Palr.pulseChargeStart;
+        chargeColourEnd = Palr.pulseChargeEnd;
     }
 
     @Override

@@ -40,7 +40,7 @@ public class RustingBlocks implements ContentList{
         //pailean
         paileanStolnen, paileanPathen, paileanWallen,
         //navy
-        classemStolnene, classemPathen, classemWallen,
+        classemStolnene, classemPathen, classemPulsen, classemWallen, classemBarrreren,
         //ore blocks
         melonaleum,
         //pulse
@@ -105,9 +105,21 @@ public class RustingBlocks implements ContentList{
             variants = 3;
             emitLight = true;
             lightColor = new Color(Palr.pulseChargeStart).a(0.05f);
-            lightRadius = 4;
-            attributes.set(Attribute.water, 0.65f);
+            lightRadius = 10;
+            attributes.set(Attribute.water, 0.15f);
             attributes.set(Attribute.heat, -0.15f);
+        }};
+
+
+        classemPulsen = new Floor("classem-pulsen"){{
+            speedMultiplier = 0.85f;
+            variants = 6;
+            emitLight = true;
+            lightColor = new Color(Palr.pulseChargeStart).a(0.19f);
+            lightRadius = 15;
+            attributes.set(Attribute.water, 0.75f);
+            attributes.set(Attribute.heat, -0.55f);
+            attributes.set(Attribute.spores, -0.15f);
         }};
 
         classemPathen = new Floor("classem-pathen"){{
@@ -116,7 +128,7 @@ public class RustingBlocks implements ContentList{
             emitLight = true;
             lightColor = new Color(Palr.pulseChargeStart).a(0.25f);
             lightRadius = 7;
-            attributes.set(Attribute.water, 1.15f);
+            attributes.set(Attribute.water, 1.35f);
             attributes.set(Attribute.heat, -0.35f);
         }};
 
@@ -125,6 +137,10 @@ public class RustingBlocks implements ContentList{
         }};
 
         classemWallen = new StaticWall("classem-wallen"){{
+            variants = 2;
+        }};
+
+        classemBarrreren = new StaticWall("classem-barreren"){{
             variants = 2;
         }};
 

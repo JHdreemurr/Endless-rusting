@@ -37,7 +37,7 @@ public class Mathr {
     }
 
     //reflects y accros a line
-    public static double Y(double y, double reflecy){
+    public static double reflectY(double y, double reflecy){
         return reflect(0, y, reflecy, 0).y;
     }
 

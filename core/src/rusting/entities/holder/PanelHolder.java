@@ -25,7 +25,7 @@ public class PanelHolder {
         this.name = name;
     }
 
-    public void load(String name){
+    public void load(){
         panelRegion = Core.atlas.find(name + "-panel");
         panelOutlineRegion = Core.atlas.find(name + "-panel-outline");
         panelHeatRegion = Core.atlas.find(name + "-panel-heat");
